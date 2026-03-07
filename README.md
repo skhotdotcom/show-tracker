@@ -1,36 +1,142 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Show Tracker
 
-## Getting Started
+A local-first app for tracking what you watch. Add TV shows and movies to your queue, track your episode progress, get notified when new episodes drop, and get AI-powered recommendations — all from a clean, browsable interface.
 
-First, run the development server:
+---
+
+## What It Does
+
+- **Continue Watching** — See exactly where you left off, down to the specific episode (e.g. S03E07). Cards show the episode still image, title, and air date.
+- **Watch Next** — A queue of shows and movies you plan to start.
+- **Coming Soon** — TV shows you're watching where the next episode hasn't aired yet. Shows the episode title and how many days until it's available.
+- **History** — Completed, dropped, and finished shows with star ratings.
+- **AI Recommendations** — Powered by a local LLM (LM Studio) based on what you've watched and rated.
+- **AI Chat** — Ask questions about your watchlist, get suggestions, or discuss shows.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 14 (App Router) |
+| Language | TypeScript |
+| Database | SQLite via `better-sqlite3` |
+| UI | shadcn/ui + Tailwind CSS |
+| Metadata | TMDB API |
+| AI | LM Studio (local LLM, OpenAI-compatible) |
+
+---
+
+## Setup
+
+### 1. Clone and install
+
+```bash
+git clone <repo-url>
+cd show-tracker
+npm install
+```
+
+### 2. Configure environment variables
+
+Copy `.env.example` to `.env.local` and fill in your keys:
+
+```bash
+cp .env.example .env.local
+```
+
+```env
+TMDB_API_KEY=your_tmdb_api_key_here
+```
+
+Get a free TMDB API key at [themoviedb.org](https://www.themoviedb.org/settings/api).
+
+### 3. Start LM Studio (for AI features)
+
+Open [LM Studio](https://lmstudio.ai), load a model, and start the local server on port `1234`. The app will work without it — AI features will simply be unavailable.
+
+### 4. Run the dev server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project Structure
 
-## Learn More
+```
+app/
+  page.tsx                  # Main page layout and tab routing
+  api/
+    shows/                  # CRUD for shows, status changes, ratings
+    search/                 # TMDB search proxy (server-side)
+    upcoming/               # Next episode lookup + air date checking
+    recommendations/        # AI recommendation generation
+    chat/                   # AI chat endpoint
+    history/                # Watched history
 
-To learn more about Next.js, take a look at the following resources:
+hooks/
+  useShows.ts               # Show list state, status/rating mutations
+  useUpcoming.ts            # Next episode info, available vs coming soon
+  useRecommendations.ts     # AI recommendation fetch/refresh
+  useChat.ts                # Chat messages and send handler
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+components/
+  show-card.tsx             # 16:9 show card with episode badge and overlay
+  carousel-row.tsx          # Horizontal scrollable row of show cards
+  recommendation-card.tsx   # Dedicated card for AI recommendations
+  history-list.tsx          # List view for completed/dropped shows
+  add-show-dialog.tsx       # Search and add shows via TMDB
+  coming-soon.tsx           # Upcoming episode cards
+  chat-panel.tsx            # Floating AI chat drawer
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+lib/
+  db.ts                     # SQLite queries and schema migrations
+  tmdb.ts                   # TMDB API client (server-side only)
+  ai.ts                     # LM Studio AI client
+```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Backlog
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### ✅ Completed
+
+- [x] Add shows and movies via TMDB search
+- [x] Status management: queued → watching → completed / dropped
+- [x] History view with completed and dropped shows
+- [x] AI recommendations based on watch history
+- [x] AI chat panel (floating drawer)
+- [x] Refactor `page.tsx` god component into custom hooks (`useShows`, `useUpcoming`, `useRecommendations`, `useChat`)
+- [x] Fix TMDB API key leak — search now routes through `/api/search` instead of calling TMDB directly from the client
+- [x] Episode-level tracking — store and display `next_season` / `next_episode` per show
+- [x] Fetch episode details from TMDB (title, air date, still image)
+- [x] 16:9 landscape cards using episode stills and show backdrops
+- [x] Episode badge (`S01E01`) always visible on watching cards
+- [x] Episode title displayed below show name on cards
+- [x] "Continue Watching" vs "Coming Soon" split by episode air date
+- [x] Mark episode as watched — auto-advances to next episode (handles season rollovers)
+- [x] Inline episode position editor on show cards
+- [x] Dedicated `RecommendationCard` component with "Add to Queue" button
+- [x] Refresh upcoming data after status changes (moving from Watch Next to Continue Watching now shows episode details immediately)
+- [x] Star ratings in History view (interactive, wired to PATCH API)
+- [x] **Carousel View All Button** - Toggle between carousel and full responsive grid per row
+
+### 🔲 Pending
+
+- [ ] **Show detail modal** — click a poster to open a full detail view with overview, notes, episode progress, and date added
+- [ ] **Episode tracking UI** — season/episode counter for TV shows in "watching" status (DB + API already support this)
+- [ ] **Notes field** — `Show.notes` exists in the DB schema but has no UI; add a textarea in the show detail modal
+- [ ] **Re-queue dropped shows** — History list only allows delete; add "Re-add to Queue" for dropped shows
+- [ ] **Mobile navigation** — nav is `hidden md:flex`; add a bottom nav bar or hamburger menu for mobile
+- [x] **Per-feature data refresh** — every mutation now refreshes only the hooks it affects; `upcoming.load()` is scoped to mutations that change what's in Continue Watching / Coming Soon
+- [ ] **`.env.example`** — document required environment variables for new contributors
+- [ ] **`.gitignore` update** — add `data/tracker.db` and `data/*.db` to prevent committing the local database
+- [ ] **Ratings on watching cards** — star rating is only in History; consider adding to the show card hover overlay
+- [ ] **Hide "Coming Soon" when empty** — currently renders a placeholder card when there are no upcoming episodes
+- [ ] **Show type badges** — small always-visible `TV` / `Movie` label on cards (currently only shown on recommendation cards)
+- [ ] **Optimistic UI updates** — mutations currently wait for server round-trips; add optimistic state for snappier feel
