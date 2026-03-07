@@ -9,17 +9,20 @@ import { AddShowDialog } from "@/components/add-show-dialog";
 import { HistoryList } from "@/components/history-list";
 import { ComingSoon } from "@/components/coming-soon";
 import { RecommendationCard } from "@/components/recommendation-card";
+import { ShowDetailDialog } from "@/components/show-detail-dialog";
 import { useShows } from "@/hooks/useShows";
 import { useChat } from "@/hooks/useChat";
 import { useRecommendations } from "@/hooks/useRecommendations";
 import { useUpcoming } from "@/hooks/useUpcoming";
 import type { NextEpisodeInfo } from "@/hooks/useUpcoming";
 import { Plus, RefreshCw, Tv, Bot, Home as HomeIcon, History } from "lucide-react";
+import type { Show } from "@/types";
 
 export default function Home() {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"home" | "history">("home");
+  const [detailShow, setDetailShow] = useState<Show | null>(null);
 
   const shows = useShows();
   const upcoming = useUpcoming();
@@ -127,6 +130,8 @@ export default function Home() {
                 onDelete={handleDelete}
                 onMarkWatched={handleMarkWatched}
                 onSetProgress={handleSetProgress}
+                onRate={shows.rate}
+                onShowClick={setDetailShow}
               />
             )}
 
@@ -135,6 +140,8 @@ export default function Home() {
               shows={queuedShows}
               onStatusChange={handleStatusChange}
               onDelete={handleDelete}
+              onRate={shows.rate}
+              onShowClick={setDetailShow}
               emptyMessage="Add shows to your queue to see them here"
             />
 
@@ -181,6 +188,7 @@ export default function Home() {
               shows={historyShows}
               onDelete={handleDelete}
               onRate={shows.rate}
+              onRequeue={(id) => handleStatusChange(id, "queued")}
             />
           </div>
         )}
@@ -235,6 +243,20 @@ export default function Home() {
         open={addDialogOpen}
         onOpenChange={setAddDialogOpen}
         onAddShow={shows.add}
+      />
+
+      <ShowDetailDialog
+        show={detailShow}
+        open={detailShow !== null}
+        onOpenChange={(open) => { if (!open) setDetailShow(null); }}
+        onRate={(id, rating) => {
+          shows.rate(id, rating);
+          setDetailShow((prev) => prev?.id === id ? { ...prev, rating } : prev);
+        }}
+        onSaveNotes={(id, notes) => {
+          shows.saveNotes(id, notes);
+          setDetailShow((prev) => prev?.id === id ? { ...prev, notes } : prev);
+        }}
       />
     </div>
   );

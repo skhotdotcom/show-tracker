@@ -16,6 +16,8 @@ interface ShowCardProps {
   onDelete?: (id: number) => void;
   onMarkWatched?: (id: number, season: number, episode: number) => Promise<void>;
   onSetProgress?: (id: number, season: number, episode: number) => Promise<void>;
+  onRate?: (id: number, rating: number) => void;
+  onShowClick?: (show: Show) => void;
   compact?: boolean;
   gridMode?: boolean;
 }
@@ -27,22 +29,30 @@ export function ShowCard({
   onDelete,
   onMarkWatched,
   onSetProgress,
+  onRate,
+  onShowClick,
   compact = false,
   gridMode = false,
 }: ShowCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [marking, setMarking] = useState(false);
   const [editingProgress, setEditingProgress] = useState(false);
-  const [editSeason, setEditSeason] = useState(nextEpisode?.season_number ?? 1);
-  const [editEp, setEditEp] = useState(nextEpisode?.episode_number ?? 1);
 
-  // Sync edit inputs when nextEpisode prop changes
+  // Use TMDB episode data when available, fall back to DB progress
+  const effectiveSeason = nextEpisode?.season_number ?? show.next_season ?? 1;
+  const effectiveEpisode = nextEpisode?.episode_number ?? show.next_episode ?? 1;
+
+  const [editSeason, setEditSeason] = useState(effectiveSeason);
+  const [editEp, setEditEp] = useState(effectiveEpisode);
+
+  // Sync edit inputs when episode data changes
   useEffect(() => {
-    if (nextEpisode && !editingProgress) {
-      setEditSeason(nextEpisode.season_number);
-      setEditEp(nextEpisode.episode_number);
+    if (!editingProgress) {
+      setEditSeason(effectiveSeason);
+      setEditEp(effectiveEpisode);
     }
-  }, [nextEpisode, editingProgress]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nextEpisode, show.next_season, show.next_episode, editingProgress]);
 
   const statusColors: Record<string, string> = {
     watching: "bg-green-600",
@@ -52,13 +62,17 @@ export function ShowCard({
   };
 
   const width = gridMode ? "w-full" : compact ? "w-48 md:w-56" : "w-64 md:w-80";
-  const hasEpisode = show.type === "tv" && nextEpisode;
+  // Show episode controls for any watching TV show (TMDB data or DB progress)
+  const hasEpisode =
+    show.type === "tv" &&
+    (nextEpisode != null ||
+      (show.status === "watching" && (show.next_season != null || show.next_episode != null)));
 
   const handleMarkWatched = async () => {
-    if (!nextEpisode || !onMarkWatched) return;
+    if (!onMarkWatched) return;
     setMarking(true);
     try {
-      await onMarkWatched(show.id, nextEpisode.season_number, nextEpisode.episode_number);
+      await onMarkWatched(show.id, effectiveSeason, effectiveEpisode);
     } finally {
       setMarking(false);
     }
@@ -82,9 +96,9 @@ export function ShowCard({
       }}
     >
       <div className="relative h-full w-full">
-        {(hasEpisode && nextEpisode.still_url) || show.backdrop_url || show.poster_url ? (
+        {nextEpisode?.still_url || show.backdrop_url || show.poster_url ? (
           <Image
-            src={(hasEpisode && nextEpisode.still_url) || show.backdrop_url || show.poster_url!}
+            src={nextEpisode?.still_url || show.backdrop_url || show.poster_url!}
             alt={show.title}
             fill
             className="object-cover object-center"
@@ -102,7 +116,7 @@ export function ShowCard({
         <div className="absolute top-2 left-2">
           {hasEpisode ? (
             <Badge className="bg-black/80 text-white text-xs font-mono border-0 tracking-wide">
-              S{String(nextEpisode.season_number).padStart(2, "0")}E{String(nextEpisode.episode_number).padStart(2, "0")}
+              S{String(effectiveSeason).padStart(2, "0")}E{String(effectiveEpisode).padStart(2, "0")}
             </Badge>
           ) : (
             <Badge className={`${statusColors[show.status]} text-xs`}>
@@ -124,7 +138,30 @@ export function ShowCard({
             isHovered ? "opacity-100" : "opacity-0"
           }`}
         >
-          <p className="text-sm font-medium line-clamp-1 mb-2">{show.title}</p>
+          <p
+            className={`text-sm font-medium line-clamp-1 mb-2 ${onShowClick ? "cursor-pointer hover:underline" : ""}`}
+            onClick={() => onShowClick?.(show)}
+          >{show.title}</p>
+
+          {/* Star rating */}
+          {onRate && (
+            <div className="flex items-center gap-0.5 mb-1.5">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                  key={star}
+                  className={`w-3 h-3 cursor-pointer transition-colors ${
+                    star <= (show.rating || 0)
+                      ? "fill-yellow-400 text-yellow-400"
+                      : "text-white/50 hover:text-yellow-400"
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRate(show.id, star);
+                  }}
+                />
+              ))}
+            </div>
+          )}
 
           {/* Inline episode position editor */}
           {hasEpisode && editingProgress ? (
@@ -190,8 +227,8 @@ export function ShowCard({
                   className="h-7 w-7 p-0 hover:bg-white/20"
                   title="Set episode position"
                   onClick={() => {
-                    setEditSeason(nextEpisode.season_number);
-                    setEditEp(nextEpisode.episode_number);
+                    setEditSeason(effectiveSeason);
+                    setEditEp(effectiveEpisode);
                     setEditingProgress(true);
                   }}
                 >
@@ -239,7 +276,7 @@ export function ShowCard({
             <p className="text-sm font-medium line-clamp-1">{show.title}</p>
             {hasEpisode && (
               <p className="text-xs text-white/70 line-clamp-1 mt-0.5">
-                S{String(nextEpisode.season_number).padStart(2, "0")}E{String(nextEpisode.episode_number).padStart(2, "0")}: {nextEpisode.name}
+                S{String(effectiveSeason).padStart(2, "0")}E{String(effectiveEpisode).padStart(2, "0")}{nextEpisode?.name ? `: ${nextEpisode.name}` : ""}
               </p>
             )}
           </div>

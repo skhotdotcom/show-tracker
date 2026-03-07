@@ -15,6 +15,8 @@ interface CarouselRowProps {
   onDelete?: (id: number) => void;
   onMarkWatched?: (id: number, season: number, episode: number) => Promise<void>;
   onSetProgress?: (id: number, season: number, episode: number) => Promise<void>;
+  onRate?: (id: number, rating: number) => void;
+  onShowClick?: (show: Show) => void;
   emptyMessage?: string;
 }
 
@@ -26,6 +28,8 @@ export function CarouselRow({
   onDelete,
   onMarkWatched,
   onSetProgress,
+  onRate,
+  onShowClick,
   emptyMessage = "No shows to display",
 }: CarouselRowProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -105,6 +109,8 @@ export function CarouselRow({
               onDelete={onDelete}
               onMarkWatched={onMarkWatched}
               onSetProgress={onSetProgress}
+              onRate={onRate}
+              onShowClick={onShowClick}
               gridMode
             />
           ))}
@@ -136,6 +142,8 @@ export function CarouselRow({
                 onDelete={onDelete}
                 onMarkWatched={onMarkWatched}
                 onSetProgress={onSetProgress}
+                onRate={onRate}
+                onShowClick={onShowClick}
               />
             ))}
           </div>

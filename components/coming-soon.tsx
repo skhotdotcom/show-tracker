@@ -29,14 +29,7 @@ export function ComingSoon({ items }: ComingSoonProps) {
     });
 
   if (upcomingItems.length === 0) {
-    return (
-      <div className="bg-card rounded-lg border p-4">
-        <h3 className="font-semibold mb-4">Coming Soon</h3>
-        <p className="text-muted-foreground text-center py-4">
-          No upcoming episodes for shows you&apos;re watching
-        </p>
-      </div>
-    );
+    return null;
   }
 
   return (

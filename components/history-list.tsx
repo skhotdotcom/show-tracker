@@ -5,16 +5,17 @@ import { format } from "date-fns";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Star } from "lucide-react";
+import { Trash2, Star, RotateCcw } from "lucide-react";
 import type { Show } from "@/types";
 
 interface HistoryListProps {
   shows: Show[];
   onDelete?: (id: number) => void;
   onRate?: (id: number, rating: number) => void;
+  onRequeue?: (id: number) => void;
 }
 
-export function HistoryList({ shows, onDelete, onRate }: HistoryListProps) {
+export function HistoryList({ shows, onDelete, onRate, onRequeue }: HistoryListProps) {
   const [filter, setFilter] = useState<"all" | "completed" | "dropped">("all");
 
   const filteredShows = shows.filter((show) => {
@@ -97,16 +98,29 @@ export function HistoryList({ shows, onDelete, onRate }: HistoryListProps) {
                 )}
               </div>
 
-              {onDelete && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="hover:text-red-400"
-                  onClick={() => onDelete(show.id)}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              )}
+              <div className="flex flex-col gap-1">
+                {show.status === "dropped" && onRequeue && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="hover:text-primary"
+                    title="Re-add to queue"
+                    onClick={() => onRequeue(show.id)}
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                  </Button>
+                )}
+                {onDelete && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="hover:text-red-400"
+                    onClick={() => onDelete(show.id)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
             </div>
           ))}
         </div>

@@ -12,6 +12,7 @@ import {
   createShow,
   updateShowStatus,
   updateShowRating,
+  updateShowNotes,
   updateShowProgress,
   markEpisodeWatched as recordEpisodeWatched,
   deleteShow,
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, status, rating, next_season, next_episode, markEpisodeWatched, season, episode } = body;
+    const { id, status, rating, notes, next_season, next_episode, markEpisodeWatched, season, episode } = body;
 
     // Mark a specific episode watched and auto-advance to next
     if (markEpisodeWatched && season !== undefined && episode !== undefined) {
@@ -91,6 +92,8 @@ export async function PATCH(request: NextRequest) {
       show = updateShowStatus(id, status);
     } else if (rating !== undefined) {
       show = updateShowRating(id, rating);
+    } else if (notes !== undefined) {
+      show = updateShowNotes(id, notes);
     } else {
       return NextResponse.json({ error: "No update provided" }, { status: 400 });
     }

@@ -104,6 +104,10 @@ lib/
 
 ## Backlog
 
+### 🔲 Pending
+
+*(nothing left)*
+
 ### ✅ Completed
 
 - [x] Add shows and movies via TMDB search
@@ -124,19 +128,16 @@ lib/
 - [x] Dedicated `RecommendationCard` component with "Add to Queue" button
 - [x] Refresh upcoming data after status changes (moving from Watch Next to Continue Watching now shows episode details immediately)
 - [x] Star ratings in History view (interactive, wired to PATCH API)
-- [x] **Carousel View All Button** - Toggle between carousel and full responsive grid per row
-
-### 🔲 Pending
-
-- [ ] **Show detail modal** — click a poster to open a full detail view with overview, notes, episode progress, and date added
-- [ ] **Episode tracking UI** — season/episode counter for TV shows in "watching" status (DB + API already support this)
-- [ ] **Notes field** — `Show.notes` exists in the DB schema but has no UI; add a textarea in the show detail modal
-- [ ] **Re-queue dropped shows** — History list only allows delete; add "Re-add to Queue" for dropped shows
-- [ ] **Mobile navigation** — nav is `hidden md:flex`; add a bottom nav bar or hamburger menu for mobile
-- [x] **Per-feature data refresh** — every mutation now refreshes only the hooks it affects; `upcoming.load()` is scoped to mutations that change what's in Continue Watching / Coming Soon
-- [ ] **`.env.example`** — document required environment variables for new contributors
-- [ ] **`.gitignore` update** — add `data/tracker.db` and `data/*.db` to prevent committing the local database
-- [ ] **Ratings on watching cards** — star rating is only in History; consider adding to the show card hover overlay
-- [ ] **Hide "Coming Soon" when empty** — currently renders a placeholder card when there are no upcoming episodes
-- [ ] **Show type badges** — small always-visible `TV` / `Movie` label on cards (currently only shown on recommendation cards)
-- [ ] **Optimistic UI updates** — mutations currently wait for server round-trips; add optimistic state for snappier feel
+- [x] **Carousel View All Button** — toggle between carousel and full responsive grid per row
+- [x] **Per-feature data refresh** — every mutation refreshes only the hooks it affects
+- [x] **`.env.example`** — all required environment variables documented for new contributors
+- [x] **`.gitignore` update** — `data/` directory ignored to prevent committing the local database
+- [x] **Hide "Coming Soon" when empty** — section returns null when there are no upcoming episodes
+- [x] **Mobile navigation** — fixed bottom nav bar for mobile (Home + History tabs)
+- [x] **Episode tracking UI** — season/episode counter with inline editor on watching cards
+- [x] **Show type badges** — `TV` / `Movie` label shown in status badge on cards
+- [x] **Optimistic UI updates** — all mutations in `useShows` apply optimistic local state immediately and revert on server error
+- [x] **Show detail modal** — click a show title on hover to open a detail view with overview, notes, episode progress, date added, and ratings
+- [x] **Notes field** — textarea in the show detail modal, saved via PATCH API
+- [x] **Re-queue dropped shows** — History list now shows a re-queue button for dropped shows
+- [x] **Ratings on watching cards** — interactive star rating in the show card hover overlay
