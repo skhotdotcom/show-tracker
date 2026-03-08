@@ -1,6 +1,6 @@
 "use client";
 
-import { format, isAfter, parseISO, differenceInDays } from "date-fns";
+import { format, isAfter, parseISO, differenceInDays, startOfDay } from "date-fns";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock } from "lucide-react";
@@ -38,7 +38,7 @@ export function ComingSoon({ items, onShowClick }: ComingSoonProps) {
       <h3 className="font-semibold mb-4">Coming Soon</h3>
       <div className="space-y-3">
         {upcomingItems.map((item) => {
-          const days = differenceInDays(parseISO(item.nextEpisode!.air_date), new Date());
+          const days = differenceInDays(parseISO(item.nextEpisode!.air_date), startOfDay(new Date()));
           const airDate = parseISO(item.nextEpisode!.air_date);
 
           return (

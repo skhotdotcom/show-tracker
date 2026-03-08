@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { format } from "date-fns";
+import { parseDbDate } from "@/lib/dates";
 import {
   Dialog,
   DialogContent,
@@ -291,7 +292,7 @@ export function ShowDetailDialog({
           {/* Date added */}
           {show.created_at && (
             <p className="text-xs text-muted-foreground">
-              Added {format(new Date(show.created_at), "MMM d, yyyy")}
+              Added {format(parseDbDate(show.created_at), "MMM d, yyyy")}
             </p>
           )}
 

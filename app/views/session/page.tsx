@@ -9,6 +9,7 @@ import {
   isSameDay,
   startOfDay,
 } from "date-fns";
+import { parseDbDate } from "@/lib/dates";
 import { Sparkles, Play, Plus, Tv, Clock, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -41,7 +42,7 @@ function buildSession(
   // 1. Watching shows with a new episode airing within 2 days — catch up before it drops
   for (const item of comingSoon) {
     if (!item.nextEpisode || item.show.status !== "watching") continue;
-    const daysUntil = differenceInDays(parseISO(item.nextEpisode.air_date), now);
+    const daysUntil = differenceInDays(parseISO(item.nextEpisode.air_date), startOfDay(now));
     if (daysUntil <= 2) {
       const when = daysUntil === 0 ? "today" : daysUntil === 1 ? "tomorrow" : `in ${daysUntil} days`;
       candidates.push({
@@ -57,7 +58,7 @@ function buildSession(
   // 2. Most recently watched (momentum — keep the streak going)
   const recentlyActive = allShows
     .filter((s) => s.status === "watching" && !usedIds.has(s.id) && s.updated_at)
-    .map((s) => ({ show: s, days: differenceInDays(now, new Date(s.updated_at!)) }))
+    .map((s) => ({ show: s, days: differenceInDays(startOfDay(now), startOfDay(parseDbDate(s.updated_at!))) }))
     .filter(({ days }) => days <= 3)
     .sort((a, b) => a.days - b.days);
 
@@ -76,7 +77,7 @@ function buildSession(
   if (candidates.length < 3) {
     const idle = allShows
       .filter((s) => s.status === "watching" && !usedIds.has(s.id) && s.updated_at)
-      .map((s) => ({ show: s, days: differenceInDays(now, new Date(s.updated_at!)) }))
+      .map((s) => ({ show: s, days: differenceInDays(startOfDay(now), startOfDay(parseDbDate(s.updated_at!))) }))
       .filter(({ days }) => days >= 5 && days <= 14)
       .sort((a, b) => a.days - b.days);
 
@@ -424,8 +425,8 @@ export default function SessionView() {
     return shows.shows
       .filter((s) => (s.status === "watching" || s.status === "queued") && !comingSoonIds.has(s.id))
       .sort((a, b) => {
-        const da = a.updated_at ? new Date(a.updated_at).getTime() : 0;
-        const db = b.updated_at ? new Date(b.updated_at).getTime() : 0;
+        const da = a.updated_at ? parseDbDate(a.updated_at).getTime() : 0;
+        const db = b.updated_at ? parseDbDate(b.updated_at).getTime() : 0;
         return db - da;
       });
   }, [shows.shows, upcoming.comingSoon]);
@@ -434,7 +435,7 @@ export default function SessionView() {
   const pastEntries = useMemo((): PastEntry[] => {
     const entries: PastEntry[] = [];
     for (const show of shows.shows) {
-      const date = show.updated_at ? new Date(show.updated_at) : new Date(show.created_at);
+      const date = show.updated_at ? parseDbDate(show.updated_at) : parseDbDate(show.created_at);
       if (show.status === "watching") {
         const s = show.next_season ?? 1;
         const e = show.next_episode ?? 1;
@@ -450,7 +451,7 @@ export default function SessionView() {
           detail: `Stopped at S${String(show.next_season ?? 1).padStart(2,"0")}E${String(show.next_episode ?? 1).padStart(2,"0")}`,
         });
       } else if (show.status === "queued") {
-        entries.push({ date: new Date(show.created_at), show, type: "queued", detail: "Added to queue" });
+        entries.push({ date: parseDbDate(show.created_at), show, type: "queued", detail: "Added to queue" });
       }
     }
     return entries.sort((a, b) => b.date.getTime() - a.date.getTime());

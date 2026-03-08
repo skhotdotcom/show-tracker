@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { format } from "date-fns";
+import { parseDbDate } from "@/lib/dates";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -95,7 +96,7 @@ export function HistoryList({ shows, onDelete, onRate, onRequeue, onShowClick }:
                 </div>
                 {show.updated_at && (
                   <p className="text-xs text-muted-foreground mt-1">
-                    {format(new Date(show.updated_at), "MMM d, yyyy")}
+                    {format(parseDbDate(show.updated_at), "MMM d, yyyy")}
                   </p>
                 )}
               </div>

@@ -12,6 +12,7 @@ import {
   startOfDay,
   isSameDay,
 } from "date-fns";
+import { parseDbDate } from "@/lib/dates";
 import { CheckCircle2, Calendar, Play, Plus, Tv } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,7 +37,7 @@ function getUrgency(show: Show): Urgency {
   if (!show.updated_at) {
     return { label: "New", dotColor: "bg-blue-500", badgeClass: "bg-blue-600 text-white", priority: 50 };
   }
-  const days = differenceInDays(new Date(), new Date(show.updated_at));
+  const days = differenceInDays(startOfDay(new Date()), startOfDay(parseDbDate(show.updated_at)));
   if (days === 0) return { label: "On a roll", dotColor: "bg-green-500", badgeClass: "bg-green-600 text-white", priority: 100 };
   if (days === 1) return { label: "On a roll", dotColor: "bg-green-500", badgeClass: "bg-green-600 text-white", priority: 95 };
   if (days <= 3) return { label: "Continue", dotColor: "bg-emerald-500", badgeClass: "bg-emerald-700 text-white", priority: 80 };
@@ -388,8 +389,8 @@ export default function TemporalView() {
 
     for (const show of shows.shows) {
       const date = show.updated_at
-        ? new Date(show.updated_at)
-        : new Date(show.created_at);
+        ? parseDbDate(show.updated_at)
+        : parseDbDate(show.created_at);
 
       if (show.status === "watching") {
         const s = show.next_season ?? 1;
@@ -417,7 +418,7 @@ export default function TemporalView() {
         });
       } else if (show.status === "queued") {
         entries.push({
-          date: new Date(show.created_at),
+          date: parseDbDate(show.created_at),
           show,
           type: "queued",
           detail: `${show.type === "tv" ? "TV series" : "Movie"} · Added to queue`,
