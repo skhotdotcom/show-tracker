@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import Image from "next/image";
 import {
   differenceInDays,
@@ -49,6 +49,23 @@ function buildSession(
         show: item.show,
         reason: `New episode airs ${when} — good time to catch up`,
         priority: 100,
+        episodeInfo: episodeInfoMap[item.show.id],
+      });
+      usedIds.add(item.show.id);
+    }
+  }
+
+  // 1b. Queued shows with a new episode airing within 2 days — start now to be ready
+  for (const item of comingSoon) {
+    if (!item.nextEpisode || item.show.status !== "queued" || usedIds.has(item.show.id)) continue;
+    if (candidates.length >= 3) break;
+    const daysUntil = differenceInDays(parseISO(item.nextEpisode.air_date), startOfDay(now));
+    if (daysUntil <= 2) {
+      const when = daysUntil === 0 ? "today" : daysUntil === 1 ? "tomorrow" : `in ${daysUntil} days`;
+      candidates.push({
+        show: item.show,
+        reason: `New episode airs ${when} — start now to be ready`,
+        priority: 90,
         episodeInfo: episodeInfoMap[item.show.id],
       });
       usedIds.add(item.show.id);
@@ -110,16 +127,131 @@ function buildSession(
 
 // ─── Session hero card ────────────────────────────────────────────────────
 
+function CandidateRow({
+  candidate,
+  idx,
+  onShowClick,
+  onMarkWatched,
+  onStatusChange,
+  onDismiss,
+}: {
+  candidate: SessionCandidate;
+  idx: number;
+  onShowClick: (show: Show) => void;
+  onMarkWatched: (id: number, season: number, episode: number) => Promise<void>;
+  onStatusChange: (id: number, status: string) => void;
+  onDismiss: (id: number) => void;
+}) {
+  const [done, setDone] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { show, reason, episodeInfo } = candidate;
+  const isMovie = show.type === "movie";
+  const season = episodeInfo?.season_number ?? show.next_season ?? 1;
+  const episode = episodeInfo?.episode_number ?? show.next_episode ?? 1;
+
+  useEffect(() => () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); }, []);
+
+  const handleAction = async () => {
+    if (show.status === "queued") {
+      onStatusChange(show.id, "watching");
+    } else if (isMovie) {
+      onStatusChange(show.id, "completed");
+    } else {
+      await onMarkWatched(show.id, season, episode);
+    }
+    setDone(true);
+    timeoutRef.current = setTimeout(() => setDone(false), 1500);
+  };
+
+  return (
+    <div
+      className="flex items-start gap-4 px-5 py-4 hover:bg-muted/30 transition-colors cursor-pointer group"
+      onClick={() => onShowClick(show)}
+    >
+      {/* Number */}
+      <span className="text-2xl font-bold text-muted-foreground/40 w-6 flex-shrink-0 mt-0.5 select-none">
+        {idx + 1}
+      </span>
+
+      {/* Poster */}
+      <div className="w-12 h-16 relative rounded-md overflow-hidden flex-shrink-0">
+        {show.poster_url ? (
+          <Image src={show.poster_url} alt={show.title} fill className="object-cover" sizes="48px" />
+        ) : (
+          <div className="w-full h-full bg-muted flex items-center justify-center">
+            <Tv className="w-4 h-4 text-muted-foreground" />
+          </div>
+        )}
+      </div>
+
+      {/* Info */}
+      <div className="flex-1 min-w-0">
+        <p className="font-semibold line-clamp-1">{show.title}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          {isMovie
+            ? "Movie"
+            : `S${String(season).padStart(2, "0")}E${String(episode).padStart(2, "0")}${episodeInfo?.name ? ` — ${episodeInfo.name}` : ""}`}
+        </p>
+        <p className="text-xs text-primary/80 mt-1.5 italic">{reason}</p>
+      </div>
+
+      {/* Quick action + dismiss */}
+      <div
+        className="flex-shrink-0 flex flex-col items-end gap-1.5"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Button
+          size="sm"
+          variant="outline"
+          className={`h-7 text-xs gap-1 transition-all ${done ? "bg-green-600 hover:bg-green-600 text-white border-green-600" : ""}`}
+          onClick={handleAction}
+          disabled={done}
+        >
+          {done ? (
+            <>
+              <CheckCircle2 className="w-3 h-3" />
+              Done
+            </>
+          ) : show.status === "queued" ? (
+            <>
+              <Play className="w-3 h-3" />
+              Start
+            </>
+          ) : isMovie ? (
+            <>
+              <CheckCircle2 className="w-3 h-3" />
+              Done
+            </>
+          ) : (
+            <>
+              <CheckCircle2 className="w-3 h-3" />
+              Watched
+            </>
+          )}
+        </Button>
+        <button
+          className="text-[10px] text-muted-foreground/40 hover:text-muted-foreground transition-colors leading-none"
+          onClick={() => onDismiss(show.id)}
+        >
+          not tonight
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function SessionCard({
   candidates,
   onShowClick,
   onMarkWatched,
   onStatusChange,
+  onDismiss,
 }: {
   candidates: SessionCandidate[];
   onShowClick: (show: Show) => void;
   onMarkWatched: (id: number, season: number, episode: number) => Promise<void>;
   onStatusChange: (id: number, status: string) => void;
+  onDismiss: (id: number) => void;
 }) {
   if (candidates.length === 0) {
     return (
@@ -140,87 +272,17 @@ function SessionCard({
 
       {/* Show list */}
       <div className="divide-y">
-        {candidates.map((candidate, idx) => {
-          const { show, reason, episodeInfo } = candidate;
-          const isMovie = show.type === "movie";
-          const season = episodeInfo?.season_number ?? show.next_season ?? 1;
-          const episode = episodeInfo?.episode_number ?? show.next_episode ?? 1;
-
-          return (
-            <div
-              key={show.id}
-              className="flex items-start gap-4 px-5 py-4 hover:bg-muted/30 transition-colors cursor-pointer group"
-              onClick={() => onShowClick(show)}
-            >
-              {/* Number */}
-              <span className="text-2xl font-bold text-muted-foreground/40 w-6 flex-shrink-0 mt-0.5 select-none">
-                {idx + 1}
-              </span>
-
-              {/* Poster */}
-              <div className="w-12 h-16 relative rounded-md overflow-hidden flex-shrink-0">
-                {show.poster_url ? (
-                  <Image src={show.poster_url} alt={show.title} fill className="object-cover" sizes="48px" />
-                ) : (
-                  <div className="w-full h-full bg-muted flex items-center justify-center">
-                    <Tv className="w-4 h-4 text-muted-foreground" />
-                  </div>
-                )}
-              </div>
-
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold line-clamp-1">{show.title}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {isMovie
-                    ? "Movie"
-                    : `S${String(season).padStart(2, "0")}E${String(episode).padStart(2, "0")}${episodeInfo?.name ? ` — ${episodeInfo.name}` : ""}`}
-                </p>
-                <p className="text-xs text-primary/80 mt-1.5 italic">{reason}</p>
-              </div>
-
-              {/* Quick action — visible always, not just hover */}
-              <div
-                className="flex-shrink-0 flex flex-col items-end gap-1"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {show.status === "queued" ? (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 text-xs gap-1"
-                    onClick={() => onStatusChange(show.id, "watching")}
-                  >
-                    <Play className="w-3 h-3" />
-                    Start
-                  </Button>
-                ) : isMovie ? (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 text-xs gap-1"
-                    onClick={() => onStatusChange(show.id, "completed")}
-                  >
-                    <CheckCircle2 className="w-3 h-3" />
-                    Done
-                  </Button>
-                ) : (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 text-xs gap-1"
-                    onClick={async () => {
-                      await onMarkWatched(show.id, season, episode);
-                    }}
-                  >
-                    <CheckCircle2 className="w-3 h-3" />
-                    Watched
-                  </Button>
-                )}
-              </div>
-            </div>
-          );
-        })}
+        {candidates.map((candidate, idx) => (
+          <CandidateRow
+            key={candidate.show.id}
+            candidate={candidate}
+            idx={idx}
+            onShowClick={onShowClick}
+            onMarkWatched={onMarkWatched}
+            onStatusChange={onStatusChange}
+            onDismiss={onDismiss}
+          />
+        ))}
       </div>
     </div>
   );
@@ -409,10 +471,18 @@ export default function SessionView() {
 
   const detailNextEpisode = detailShowId != null ? (episodeInfoMap[detailShowId] ?? null) : null;
 
-  // Session suggestion
+  // Session suggestion — with dismiss support
+  const dismissedIds = useRef<Set<number>>(new Set());
+  const [dismissCount, setDismissCount] = useState(0);
+  const handleDismiss = (id: number) => {
+    dismissedIds.current.add(id);
+    setDismissCount((c) => c + 1);
+  };
   const sessionCandidates = useMemo(
-    () => buildSession(shows.shows, episodeInfoMap, upcoming.comingSoon),
-    [shows.shows, episodeInfoMap, upcoming.comingSoon]
+    () => buildSession(shows.shows, episodeInfoMap, upcoming.comingSoon)
+          .filter((c) => !dismissedIds.current.has(c.show.id)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [shows.shows, episodeInfoMap, upcoming.comingSoon, dismissCount]
   );
   const sessionIds = useMemo(
     () => new Set(sessionCandidates.map((c) => c.show.id)),
@@ -506,6 +576,7 @@ export default function SessionView() {
             onShowClick={(s) => setDetailShowId(s.id)}
             onMarkWatched={handleMarkWatched}
             onStatusChange={handleStatusChange}
+            onDismiss={handleDismiss}
           />
         </section>
 

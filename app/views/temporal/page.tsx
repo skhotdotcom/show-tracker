@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import Image from "next/image";
 import {
   differenceInDays,
@@ -345,6 +345,10 @@ export default function TemporalView() {
 
   const detailNextEpisode = detailShowId != null ? (episodeInfoMap[detailShowId] ?? null) : null;
 
+  // Scroll preservation for the Now carousel — mirrors the CarouselRow pattern
+  const nowScrollRef = useRef<HTMLDivElement>(null);
+  const nowScrollPositionRef = useRef(0);
+
   // NOW zone: watching shows (excluding comingSoon), sorted by urgency
   const comingSoonIds = useMemo(
     () => new Set(upcoming.comingSoon.map((i) => i.show.id)),
@@ -356,6 +360,15 @@ export default function TemporalView() {
       .filter((s) => s.status === "watching" && !comingSoonIds.has(s.id))
       .sort((a, b) => getUrgency(b).priority - getUrgency(a).priority);
   }, [shows.shows, comingSoonIds]);
+
+  useEffect(() => {
+    const el = nowScrollRef.current;
+    if (!el) return;
+    el.scrollLeft = nowScrollPositionRef.current;
+    const save = () => { nowScrollPositionRef.current = el.scrollLeft; };
+    el.addEventListener("scroll", save);
+    return () => el.removeEventListener("scroll", save);
+  }, [activeShows]);
 
   // THIS WEEK: queued shows (ready today) + comingSoon items airing in next 7 days
   const thisWeekItems = useMemo((): WeekItem[] => {
@@ -471,7 +484,7 @@ export default function TemporalView() {
               Nothing to continue. Start something from your queue below.
             </p>
           ) : (
-            <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 snap-x">
+            <div ref={nowScrollRef} className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 snap-x">
               {activeShows.map((show) => (
                 <div key={show.id} className="snap-start">
                   <NowCard

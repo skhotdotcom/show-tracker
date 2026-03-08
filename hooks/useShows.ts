@@ -126,7 +126,9 @@ export function useShows() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: showId, next_season: nextSeason, next_episode: nextEpisode }),
     });
-    if (!res.ok) {
+    if (res.ok) {
+      toast.success("Position updated");
+    } else {
       await refresh();
       toast.error("Failed to update progress");
     }
@@ -141,7 +143,9 @@ export function useShows() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, notes }),
     });
-    if (!res.ok) {
+    if (res.ok) {
+      toast.success("Notes saved");
+    } else {
       await refresh();
       toast.error("Failed to save notes");
     }
