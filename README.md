@@ -4,6 +4,12 @@ A local-first app for tracking what you watch. Add TV shows and movies to your q
 
 ---
 
+## Docs
+
+- [UX Research](docs/ux-research.md) — Personas, cognitive walkthroughs, SUS scores, and 4 L's across two evaluation rounds (SUS 62.5 → 75.0)
+
+---
+
 ## What It Does
 
 - **Continue Watching** — See exactly where you left off, down to the specific episode (e.g. S03E07). Cards show the episode still image, title, and air date.
