@@ -18,9 +18,10 @@ interface ComingSoonItem {
 
 interface ComingSoonProps {
   items: ComingSoonItem[];
+  onShowClick?: (show: Show) => void;
 }
 
-export function ComingSoon({ items }: ComingSoonProps) {
+export function ComingSoon({ items, onShowClick }: ComingSoonProps) {
   const upcomingItems = items
     .filter((item) => item.nextEpisode && isAfter(parseISO(item.nextEpisode.air_date), new Date()))
     .sort((a, b) => {
@@ -43,7 +44,8 @@ export function ComingSoon({ items }: ComingSoonProps) {
           return (
             <div
               key={item.show.id}
-              className="flex gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+              className={`flex gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors ${onShowClick ? "cursor-pointer" : ""}`}
+              onClick={() => onShowClick?.(item.show)}
             >
               <div className="w-12 h-16 relative rounded overflow-hidden flex-shrink-0">
                 {item.show.poster_url ? (

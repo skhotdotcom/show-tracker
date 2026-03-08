@@ -13,9 +13,10 @@ interface HistoryListProps {
   onDelete?: (id: number) => void;
   onRate?: (id: number, rating: number) => void;
   onRequeue?: (id: number) => void;
+  onShowClick?: (show: Show) => void;
 }
 
-export function HistoryList({ shows, onDelete, onRate, onRequeue }: HistoryListProps) {
+export function HistoryList({ shows, onDelete, onRate, onRequeue, onShowClick }: HistoryListProps) {
   const [filter, setFilter] = useState<"all" | "completed" | "dropped">("all");
 
   const filteredShows = shows.filter((show) => {
@@ -50,7 +51,8 @@ export function HistoryList({ shows, onDelete, onRate, onRequeue }: HistoryListP
           {filteredShows.map((show) => (
             <div
               key={show.id}
-              className="flex gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+              className={`flex gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors ${onShowClick ? "cursor-pointer" : ""}`}
+              onClick={() => onShowClick?.(show)}
             >
               <div className="w-16 h-24 relative rounded overflow-hidden flex-shrink-0">
                 {show.poster_url ? (
@@ -87,7 +89,7 @@ export function HistoryList({ shows, onDelete, onRate, onRequeue }: HistoryListP
                           ? "fill-yellow-400 text-yellow-400"
                           : "text-muted-foreground hover:text-yellow-400"
                       }`}
-                      onClick={() => onRate?.(show.id, star)}
+                      onClick={(e) => { e.stopPropagation(); onRate?.(show.id, star); }}
                     />
                   ))}
                 </div>
@@ -105,7 +107,7 @@ export function HistoryList({ shows, onDelete, onRate, onRequeue }: HistoryListP
                     size="icon"
                     className="hover:text-primary"
                     title="Re-add to queue"
-                    onClick={() => onRequeue(show.id)}
+                    onClick={(e) => { e.stopPropagation(); onRequeue(show.id); }}
                   >
                     <RotateCcw className="w-4 h-4" />
                   </Button>
@@ -115,7 +117,7 @@ export function HistoryList({ shows, onDelete, onRate, onRequeue }: HistoryListP
                     variant="ghost"
                     size="icon"
                     className="hover:text-red-400"
-                    onClick={() => onDelete(show.id)}
+                    onClick={(e) => { e.stopPropagation(); onDelete(show.id); }}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>

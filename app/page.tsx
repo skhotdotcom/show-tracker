@@ -16,13 +16,13 @@ import { useRecommendations } from "@/hooks/useRecommendations";
 import { useUpcoming } from "@/hooks/useUpcoming";
 import type { NextEpisodeInfo } from "@/hooks/useUpcoming";
 import { Plus, RefreshCw, Tv, Bot, Home as HomeIcon, History } from "lucide-react";
-import type { Show } from "@/types";
+import { ViewSwitcher } from "@/components/view-switcher";
 
 export default function Home() {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"home" | "history">("home");
-  const [detailShow, setDetailShow] = useState<Show | null>(null);
+  const [detailShowId, setDetailShowId] = useState<number | null>(null);
 
   const shows = useShows();
   const upcoming = useUpcoming();
@@ -40,6 +40,11 @@ export default function Home() {
     upcoming.load();
   }, []);
 
+  // Derive detailShow from ID so it auto-syncs with useShows optimistic updates
+  const detailShow = detailShowId != null
+    ? (shows.shows.find((s) => s.id === detailShowId) ?? null)
+    : null;
+
   // Build episode info map for the "Continue Watching" carousel
   const episodeInfoMap: Record<number, NextEpisodeInfo> = {};
   for (const item of upcoming.availableNow) {
@@ -47,6 +52,8 @@ export default function Home() {
       episodeInfoMap[item.show.id] = item.nextEpisode;
     }
   }
+
+  const detailNextEpisode = detailShowId != null ? (episodeInfoMap[detailShowId] ?? null) : null;
 
   // TV shows whose next episode hasn't aired yet go to Coming Soon, not Continue Watching
   const comingSoonShowIds = new Set(upcoming.comingSoon.map((i) => i.show.id));
@@ -110,10 +117,13 @@ export default function Home() {
               </Button>
             </nav>
           </div>
-          <Button onClick={() => setAddDialogOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Show
-          </Button>
+          <div className="flex items-center gap-3">
+            <ViewSwitcher />
+            <Button onClick={() => setAddDialogOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Show
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -131,7 +141,7 @@ export default function Home() {
                 onMarkWatched={handleMarkWatched}
                 onSetProgress={handleSetProgress}
                 onRate={shows.rate}
-                onShowClick={setDetailShow}
+                onShowClick={(s) => setDetailShowId(s.id)}
               />
             )}
 
@@ -141,12 +151,15 @@ export default function Home() {
               onStatusChange={handleStatusChange}
               onDelete={handleDelete}
               onRate={shows.rate}
-              onShowClick={setDetailShow}
+              onShowClick={(s) => setDetailShowId(s.id)}
               emptyMessage="Add shows to your queue to see them here"
             />
 
             {upcoming.comingSoon.length > 0 && (
-              <ComingSoon items={upcoming.comingSoon} />
+              <ComingSoon
+                items={upcoming.comingSoon}
+                onShowClick={(s) => setDetailShowId(s.id)}
+              />
             )}
 
             <div className="flex items-center justify-between">
@@ -189,6 +202,7 @@ export default function Home() {
               onDelete={handleDelete}
               onRate={shows.rate}
               onRequeue={(id) => handleStatusChange(id, "queued")}
+              onShowClick={(s) => setDetailShowId(s.id)}
             />
           </div>
         )}
@@ -247,16 +261,15 @@ export default function Home() {
 
       <ShowDetailDialog
         show={detailShow}
-        open={detailShow !== null}
-        onOpenChange={(open) => { if (!open) setDetailShow(null); }}
-        onRate={(id, rating) => {
-          shows.rate(id, rating);
-          setDetailShow((prev) => prev?.id === id ? { ...prev, rating } : prev);
-        }}
-        onSaveNotes={(id, notes) => {
-          shows.saveNotes(id, notes);
-          setDetailShow((prev) => prev?.id === id ? { ...prev, notes } : prev);
-        }}
+        nextEpisode={detailNextEpisode}
+        open={detailShowId !== null}
+        onOpenChange={(open) => { if (!open) setDetailShowId(null); }}
+        onRate={shows.rate}
+        onSaveNotes={shows.saveNotes}
+        onMarkWatched={handleMarkWatched}
+        onSetProgress={handleSetProgress}
+        onStatusChange={handleStatusChange}
+        onDelete={handleDelete}
       />
     </div>
   );

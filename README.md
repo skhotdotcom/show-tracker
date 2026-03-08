@@ -10,8 +10,39 @@ A local-first app for tracking what you watch. Add TV shows and movies to your q
 - **Watch Next** — A queue of shows and movies you plan to start.
 - **Coming Soon** — TV shows you're watching where the next episode hasn't aired yet. Shows the episode title and how many days until it's available.
 - **History** — Completed, dropped, and finished shows with star ratings.
+- **Detail Dialog** — Full action hub for any show: mark episodes watched, edit S/E position, change status (start/complete/drop), rate, take notes, and delete.
 - **AI Recommendations** — Powered by a local LLM (LM Studio) based on what you've watched and rated.
 - **AI Chat** — Ask questions about your watchlist, get suggestions, or discuss shows.
+
+---
+
+## Views
+
+The app ships three views, switchable from the header. Each is a distinct mental model for interacting with your library.
+
+### Classic
+The default status-bucket layout. Shows are organized into carousels by status: Continue Watching, Coming Soon, Watch Next, and History. Best for browsing your full library and managing individual shows.
+
+### Timeline (`/views/temporal`)
+Organizes your library by urgency rather than status. Three zones:
+
+- **Now** — Active shows sorted by how recently you watched them. Each card shows an urgency badge (On a roll → Continue → Pick back up → Dive back in) and a permanently visible Mark Watched button — no hover required.
+- **This Week** — Episodes airing today through the next 7 days, plus queued shows ready to start.
+- **Activity** — A date-grouped journal of recent watch activity.
+
+Best for: maintaining momentum across a large in-progress library.
+
+### Session (`/views/session`)
+Prescriptive session planner. Answers "what should I watch tonight?" using a priority algorithm:
+
+1. Shows with an episode airing within 2 days (catch up while it's relevant)
+2. Shows watched in the last 3 days (keep the momentum)
+3. Shows idle for 5–14 days (gentle nudge back)
+4. Queued shows ready to start
+
+Suggestions appear as a ranked numbered list with context-aware reason text. The Available grid below highlights which shows are in tonight's suggestion and dims the rest.
+
+Best for: short-session decisions, low-friction next-action flow.
 
 ---
 
@@ -70,7 +101,12 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ```
 app/
-  page.tsx                  # Main page layout and tab routing
+  page.tsx                  # Classic view — carousels by status
+  views/
+    temporal/
+      page.tsx              # Timeline view — urgency-ranked Now / This Week / Activity
+    session/
+      page.tsx              # Session view — prescriptive "watch tonight" planner
   api/
     shows/                  # CRUD for shows, status changes, ratings
     search/                 # TMDB search proxy (server-side)
@@ -86,12 +122,14 @@ hooks/
   useChat.ts                # Chat messages and send handler
 
 components/
+  view-switcher.tsx         # Classic / Timeline / Session navigation pills
   show-card.tsx             # 16:9 show card with episode badge and overlay
-  carousel-row.tsx          # Horizontal scrollable row of show cards
+  show-detail-dialog.tsx    # Full action hub dialog (watch, rate, notes, status, delete)
+  carousel-row.tsx          # Horizontal scrollable row with scroll position preservation
   recommendation-card.tsx   # Dedicated card for AI recommendations
-  history-list.tsx          # List view for completed/dropped shows
+  history-list.tsx          # List view for completed/dropped shows (click-to-detail)
   add-show-dialog.tsx       # Search and add shows via TMDB
-  coming-soon.tsx           # Upcoming episode cards
+  coming-soon.tsx           # Upcoming episode rows (click-to-detail)
   chat-panel.tsx            # Floating AI chat drawer
 
 lib/
@@ -106,7 +144,13 @@ lib/
 
 ### 🔲 Pending
 
-*(nothing left)*
+- [ ] **Silent actions** — No feedback after Mark Watched, status changes, or ratings. Toast notifications or subtle confirmation cues would close the loop.
+- [ ] **Queue ordering** — No way to reorder the Watch Next queue. Drag-to-reorder or a priority field would let users sequence their backlog.
+- [ ] **Mid-series add flow** — Adding a show already in progress requires three steps (add → open → set episode). A "currently on episode…" field in the add dialog would reduce this to one.
+- [ ] **Binge logger shortcut** — No fast path for logging multiple episodes in one session. A "mark through S01E04" bulk action would serve binge-watchers.
+- [ ] **Rating prompt on complete** — Completing a show doesn't prompt for a rating. A completion dialog with a star prompt would capture ratings while the experience is fresh.
+- [ ] **Sort and filter** — No way to sort or filter the library by genre, network, rating, or date added.
+- [ ] **Cross-section search** — No global search across the full library.
 
 ### ✅ Completed
 
@@ -141,3 +185,12 @@ lib/
 - [x] **Notes field** — textarea in the show detail modal, saved via PATCH API
 - [x] **Re-queue dropped shows** — History list now shows a re-queue button for dropped shows
 - [x] **Ratings on watching cards** — interactive star rating in the show card hover overlay
+- [x] **Card click → detail dialog** — the card body is now the click target; no hover required to reach any action
+- [x] **Detail dialog as full action hub** — Mark Watched, Set Position, Start Watching, Mark Complete, Drop, and Delete all live in the dialog; hover overlay is a convenience shortcut, not the only path
+- [x] **Detail dialog state sync** — `detailShowId` stores an ID, not a snapshot; `detailShow` is derived live from `useShows` state so optimistic updates inside the dialog are always in sync
+- [x] **Carousel scroll preservation** — scroll position saved to a ref on every scroll event and restored after state-driven re-renders; marking a show watched no longer resets the carousel to position 0
+- [x] **Coming Soon click-to-detail** — clicking a Coming Soon row opens the show detail dialog
+- [x] **History click-to-detail** — clicking anywhere on a history row opens the show detail dialog; action buttons use `stopPropagation` to avoid conflicts
+- [x] **Timeline view** — new `/views/temporal` page with urgency-ranked Now section, This Week airing/ready section, and Activity journal; Mark Watched button always visible (no hover dependency)
+- [x] **Session view** — new `/views/session` page with prescriptive "Watch Tonight" ranked suggestions, Available poster grid, and compact history; suggestion algorithm weighs recency, upcoming air dates, and queue status
+- [x] **View switcher** — Classic / Timeline / Session navigation pills in the header; active state driven by `usePathname()`

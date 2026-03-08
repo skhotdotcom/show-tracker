@@ -38,14 +38,12 @@ export function ShowCard({
   const [marking, setMarking] = useState(false);
   const [editingProgress, setEditingProgress] = useState(false);
 
-  // Use TMDB episode data when available, fall back to DB progress
   const effectiveSeason = nextEpisode?.season_number ?? show.next_season ?? 1;
   const effectiveEpisode = nextEpisode?.episode_number ?? show.next_episode ?? 1;
 
   const [editSeason, setEditSeason] = useState(effectiveSeason);
   const [editEp, setEditEp] = useState(effectiveEpisode);
 
-  // Sync edit inputs when episode data changes
   useEffect(() => {
     if (!editingProgress) {
       setEditSeason(effectiveSeason);
@@ -62,13 +60,13 @@ export function ShowCard({
   };
 
   const width = gridMode ? "w-full" : compact ? "w-48 md:w-56" : "w-64 md:w-80";
-  // Show episode controls for any watching TV show (TMDB data or DB progress)
   const hasEpisode =
     show.type === "tv" &&
     (nextEpisode != null ||
       (show.status === "watching" && (show.next_season != null || show.next_episode != null)));
 
-  const handleMarkWatched = async () => {
+  const handleMarkWatched = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (!onMarkWatched) return;
     setMarking(true);
     try {
@@ -78,7 +76,8 @@ export function ShowCard({
     }
   };
 
-  const handleSetProgress = async () => {
+  const handleSetProgress = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (!onSetProgress) return;
     await onSetProgress(show.id, editSeason, editEp);
     setEditingProgress(false);
@@ -88,12 +87,13 @@ export function ShowCard({
     <Card
       className={`relative ${width} aspect-video overflow-hidden rounded-md border-0 bg-card transition-transform duration-300 ${
         gridMode ? "" : "flex-shrink-0"
-      } ${isHovered ? "scale-105 z-10" : "scale-100 z-0"}`}
+      } ${isHovered ? "scale-105 z-10" : "scale-100 z-0"} ${onShowClick ? "cursor-pointer" : ""}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
         setEditingProgress(false);
       }}
+      onClick={() => onShowClick?.(show)}
     >
       <div className="relative h-full w-full">
         {nextEpisode?.still_url || show.backdrop_url || show.poster_url ? (
@@ -112,7 +112,7 @@ export function ShowCard({
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
-        {/* Top-left: episode badge (for watching TV) or status badge */}
+        {/* Top-left: episode badge or status/type badge */}
         <div className="absolute top-2 left-2">
           {hasEpisode ? (
             <Badge className="bg-black/80 text-white text-xs font-mono border-0 tracking-wide">
@@ -132,16 +132,13 @@ export function ShowCard({
           </div>
         )}
 
-        {/* Hover overlay */}
+        {/* Hover overlay — quick actions, all stopPropagation to preserve card click */}
         <div
           className={`absolute bottom-0 left-0 right-0 p-2 transition-opacity duration-300 ${
             isHovered ? "opacity-100" : "opacity-0"
           }`}
         >
-          <p
-            className={`text-sm font-medium line-clamp-1 mb-2 ${onShowClick ? "cursor-pointer hover:underline" : ""}`}
-            onClick={() => onShowClick?.(show)}
-          >{show.title}</p>
+          <p className="text-sm font-medium line-clamp-1 mb-2">{show.title}</p>
 
           {/* Star rating */}
           {onRate && (
@@ -195,14 +192,13 @@ export function ShowCard({
                 size="sm"
                 variant="ghost"
                 className="h-6 px-1 hover:bg-white/20"
-                onClick={() => setEditingProgress(false)}
+                onClick={(e) => { e.stopPropagation(); setEditingProgress(false); }}
               >
                 ✗
               </Button>
             </div>
           ) : (
             <div className="flex gap-1 flex-wrap">
-              {/* TV watching: Mark Watched + edit position */}
               {hasEpisode && onMarkWatched && (
                 <Button
                   size="sm"
@@ -226,7 +222,8 @@ export function ShowCard({
                   variant="ghost"
                   className="h-7 w-7 p-0 hover:bg-white/20"
                   title="Set episode position"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     setEditSeason(effectiveSeason);
                     setEditEp(effectiveEpisode);
                     setEditingProgress(true);
@@ -235,23 +232,21 @@ export function ShowCard({
                   <Pencil className="w-3 h-3" />
                 </Button>
               )}
-              {/* Mark series complete */}
               {show.status === "watching" && onStatusChange && (
                 <Button
                   size="sm"
                   className="h-7 px-2 bg-blue-600 hover:bg-blue-700 text-xs"
-                  onClick={() => onStatusChange(show.id, "completed")}
+                  onClick={(e) => { e.stopPropagation(); onStatusChange(show.id, "completed"); }}
                 >
                   <Check className="w-3 h-3 mr-1" />
                   Done
                 </Button>
               )}
-              {/* Queued: start watching */}
               {show.status === "queued" && onStatusChange && (
                 <Button
                   size="sm"
                   className="h-7 px-2 bg-primary hover:bg-primary/80 text-xs"
-                  onClick={() => onStatusChange(show.id, "watching")}
+                  onClick={(e) => { e.stopPropagation(); onStatusChange(show.id, "watching"); }}
                 >
                   <Play className="w-3 h-3 mr-1" />
                   Watch
@@ -262,7 +257,7 @@ export function ShowCard({
                   size="sm"
                   variant="ghost"
                   className="h-7 px-2 hover:bg-red-600/20 hover:text-red-400"
-                  onClick={() => onDelete(show.id)}
+                  onClick={(e) => { e.stopPropagation(); onDelete(show.id); }}
                 >
                   <Trash2 className="w-3 h-3" />
                 </Button>

@@ -12,15 +12,21 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Star, Save } from "lucide-react";
+import { Star, Save, CheckCircle2, Play, Check, Trash2, Pencil, X } from "lucide-react";
 import type { Show } from "@/types";
+import type { NextEpisodeInfo } from "@/hooks/useUpcoming";
 
 interface ShowDetailDialogProps {
   show: Show | null;
+  nextEpisode?: NextEpisodeInfo | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onRate?: (id: number, rating: number) => void;
   onSaveNotes?: (id: number, notes: string) => void;
+  onMarkWatched?: (id: number, season: number, episode: number) => Promise<void>;
+  onSetProgress?: (id: number, season: number, episode: number) => Promise<void>;
+  onStatusChange?: (id: number, status: string) => void;
+  onDelete?: (id: number) => void;
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -39,26 +45,74 @@ const STATUS_COLORS: Record<string, string> = {
 
 export function ShowDetailDialog({
   show,
+  nextEpisode,
   open,
   onOpenChange,
   onRate,
   onSaveNotes,
+  onMarkWatched,
+  onSetProgress,
+  onStatusChange,
+  onDelete,
 }: ShowDetailDialogProps) {
   const [notes, setNotes] = useState("");
   const [notesDirty, setNotesDirty] = useState(false);
+  const [marking, setMarking] = useState(false);
+  const [editingProgress, setEditingProgress] = useState(false);
+
+  const effectiveSeason = nextEpisode?.season_number ?? show?.next_season ?? 1;
+  const effectiveEpisode = nextEpisode?.episode_number ?? show?.next_episode ?? 1;
+
+  const [editSeason, setEditSeason] = useState(effectiveSeason);
+  const [editEp, setEditEp] = useState(effectiveEpisode);
 
   useEffect(() => {
     if (show) {
       setNotes(show.notes ?? "");
       setNotesDirty(false);
+      setEditingProgress(false);
     }
-  }, [show]);
+  }, [show?.id]);
+
+  useEffect(() => {
+    if (!editingProgress) {
+      setEditSeason(effectiveSeason);
+      setEditEp(effectiveEpisode);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nextEpisode, show?.next_season, show?.next_episode, editingProgress]);
 
   if (!show) return null;
+
+  const hasEpisode =
+    show.type === "tv" &&
+    (nextEpisode != null ||
+      (show.status === "watching" && (show.next_season != null || show.next_episode != null)));
 
   const handleSaveNotes = () => {
     onSaveNotes?.(show.id, notes);
     setNotesDirty(false);
+  };
+
+  const handleMarkWatched = async () => {
+    if (!onMarkWatched) return;
+    setMarking(true);
+    try {
+      await onMarkWatched(show.id, effectiveSeason, effectiveEpisode);
+    } finally {
+      setMarking(false);
+    }
+  };
+
+  const handleSetProgress = async () => {
+    if (!onSetProgress) return;
+    await onSetProgress(show.id, editSeason, editEp);
+    setEditingProgress(false);
+  };
+
+  const handleDelete = () => {
+    onDelete?.(show.id);
+    onOpenChange(false);
   };
 
   return (
@@ -85,7 +139,7 @@ export function ShowDetailDialog({
           </div>
         )}
 
-        <div className="p-4 space-y-4">
+        <div className="p-4 space-y-4 max-h-[60vh] overflow-y-auto">
           {/* Title when no image */}
           {!show.backdrop_url && !show.poster_url && (
             <DialogHeader>
@@ -99,11 +153,6 @@ export function ShowDetailDialog({
               {STATUS_LABELS[show.status]}
             </Badge>
             <Badge variant="outline">{show.type === "tv" ? "TV" : "Movie"}</Badge>
-            {show.type === "tv" && show.next_season != null && (
-              <Badge variant="secondary" className="font-mono text-xs">
-                Up next: S{String(show.next_season).padStart(2, "0")}E{String(show.next_episode ?? 1).padStart(2, "0")}
-              </Badge>
-            )}
           </div>
 
           {/* Star rating */}
@@ -123,6 +172,111 @@ export function ShowDetailDialog({
               ))}
               {show.rating && (
                 <span className="text-sm text-muted-foreground ml-1">{show.rating}/5</span>
+              )}
+            </div>
+          )}
+
+          {/* Episode actions */}
+          {hasEpisode && (onMarkWatched || onSetProgress) && (
+            <div className="space-y-2 border rounded-lg p-3 bg-muted/30">
+              <p className="text-sm font-medium">
+                Up next: S{String(effectiveSeason).padStart(2, "0")}E{String(effectiveEpisode).padStart(2, "0")}
+                {nextEpisode?.name ? ` — ${nextEpisode.name}` : ""}
+              </p>
+              {editingProgress ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">S</span>
+                  <input
+                    type="number"
+                    min={1}
+                    value={editSeason}
+                    onChange={(e) => setEditSeason(Math.max(1, parseInt(e.target.value) || 1))}
+                    className="w-14 text-sm bg-background border rounded px-2 py-1 text-center"
+                  />
+                  <span className="text-sm text-muted-foreground">E</span>
+                  <input
+                    type="number"
+                    min={1}
+                    value={editEp}
+                    onChange={(e) => setEditEp(Math.max(1, parseInt(e.target.value) || 1))}
+                    className="w-14 text-sm bg-background border rounded px-2 py-1 text-center"
+                  />
+                  <Button size="sm" className="h-7 px-3" onClick={handleSetProgress}>
+                    Save
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 w-7 p-0"
+                    onClick={() => setEditingProgress(false)}
+                  >
+                    <X className="w-3 h-3" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex gap-2 flex-wrap">
+                  {onMarkWatched && (
+                    <Button
+                      size="sm"
+                      className="bg-green-600 hover:bg-green-700"
+                      onClick={handleMarkWatched}
+                      disabled={marking}
+                    >
+                      <CheckCircle2 className="w-3 h-3 mr-1.5" />
+                      {marking ? "Marking…" : "Mark Watched"}
+                    </Button>
+                  )}
+                  {onSetProgress && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setEditSeason(effectiveSeason);
+                        setEditEp(effectiveEpisode);
+                        setEditingProgress(true);
+                      }}
+                    >
+                      <Pencil className="w-3 h-3 mr-1.5" />
+                      Set Position
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Status actions */}
+          {onStatusChange && (
+            <div className="flex gap-2 flex-wrap">
+              {show.status === "queued" && (
+                <Button
+                  size="sm"
+                  className="bg-primary hover:bg-primary/80"
+                  onClick={() => onStatusChange(show.id, "watching")}
+                >
+                  <Play className="w-3 h-3 mr-1.5" />
+                  Start Watching
+                </Button>
+              )}
+              {show.status === "watching" && (
+                <Button
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700"
+                  onClick={() => onStatusChange(show.id, "completed")}
+                >
+                  <Check className="w-3 h-3 mr-1.5" />
+                  Mark Complete
+                </Button>
+              )}
+              {(show.status === "watching" || show.status === "queued") && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="hover:text-red-400 hover:border-red-400"
+                  onClick={() => onStatusChange(show.id, "dropped")}
+                >
+                  Drop
+                </Button>
               )}
             </div>
           )}
@@ -161,6 +315,21 @@ export function ShowDetailDialog({
                   Save Notes
                 </Button>
               )}
+            </div>
+          )}
+
+          {/* Delete */}
+          {onDelete && (
+            <div className="pt-2 border-t">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-muted-foreground hover:text-red-400 hover:bg-red-400/10"
+                onClick={handleDelete}
+              >
+                <Trash2 className="w-3 h-3 mr-1.5" />
+                Remove from Tracker
+              </Button>
             </div>
           )}
         </div>

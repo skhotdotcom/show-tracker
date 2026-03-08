@@ -33,6 +33,7 @@ export function CarouselRow({
   emptyMessage = "No shows to display",
 }: CarouselRowProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollPositionRef = useRef<number>(0);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const [viewAll, setViewAll] = useState(false);
@@ -40,15 +41,18 @@ export function CarouselRow({
   const checkScroll = () => {
     if (scrollRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      scrollPositionRef.current = scrollLeft;
       setCanScrollLeft(scrollLeft > 0);
       setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
     }
   };
 
   useEffect(() => {
-    checkScroll();
     const ref = scrollRef.current;
     if (ref) {
+      // Restore scroll position after re-render (e.g. after marking episode watched)
+      ref.scrollLeft = scrollPositionRef.current;
+      checkScroll();
       ref.addEventListener("scroll", checkScroll);
       return () => ref.removeEventListener("scroll", checkScroll);
     }
