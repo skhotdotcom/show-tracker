@@ -6,7 +6,7 @@ _Living document. Updated after each research round._
 
 ## What This Is
 
-Show Tracker is a local-first show tracking app with an experimental observation prototype. The observation prototype (`/test/observation`) presents one content title at a time and asks "How do you feel about this one?" — capturing emotional intent responses instead of traditional ratings. The main app has three views (Classic, Timeline, Session), each a different mental model for the same library.
+Proprietary research prototype containing three layers of extractable IP. The observation prototype (`/test/observation`) presents one content title at a time and asks "How do you feel about this one?" — capturing emotional intent responses validated through natural language clustering. The interaction pattern taxonomy provides a reusable design methodology. The main app has three views (Classic, Timeline, Session), each a different mental model for the same library.
 
 ---
 
