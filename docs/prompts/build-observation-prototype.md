@@ -1,4 +1,4 @@
-# Claude Code Prompt — Phase 0: Observation Layer
+# Build Prompt — Phase 0: Observation Layer
 
 _Experience prototype for behavioral calibration. This is a test, not a feature._
 

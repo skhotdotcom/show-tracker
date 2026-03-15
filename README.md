@@ -85,7 +85,7 @@ docs/
     sales.md                             # Partnerships — the moat, API surface, licensing
   prompts/                               # Reusable AI prompts and build recipes
     build-observation-prototype.md       # Build prompt for observation prototype
-    run-prototype-evaluation.md          # Eval prompt (Claude Code + general LLM variants)
+    run-prototype-evaluation.md          # Eval prompt (general LLM)
   images/                                # Screenshots for research and documentation
 ```
 

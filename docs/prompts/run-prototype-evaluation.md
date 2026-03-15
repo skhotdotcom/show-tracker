@@ -1,6 +1,6 @@
 # Prompt: Observation Prototype Evaluation — Cognitive Walkthrough + SUS + 4Ls
 
-_Synthetic persona evaluation of the observation prototype. Two variants below: one for Claude Code (reads source files), one for general LLM use (self-contained context)._
+_Synthetic persona evaluation of the observation prototype. Two variants below: one that reads source files, one for general LLM use (self-contained context)._
 
 ---
 
@@ -12,7 +12,7 @@ You are a UX researcher evaluating the Show Tracker observation prototype. Run a
 
 ---
 
-## Variant A: Claude Code (reads repo files)
+## Variant A: Code-aware (reads repo files)
 
 ### Step 1: Read the context files
 
@@ -33,7 +33,7 @@ Skip to **The Personas** below.
 
 ## Variant B: General LLM (self-contained)
 
-_Run this prompt in Claude (or any capable LLM) to get synthetic persona evaluations. The goal is to test the response language with personas that have established mental models, and see where they surprise us._
+_Run this prompt in any capable LLM to get synthetic persona evaluations. The goal is to test the response language with personas that have established mental models, and see where they surprise us._
 
 ### The Prototype
 
@@ -178,7 +178,7 @@ The highest-impact changes to make before the next test. Rank by evidence from t
 
 ## Output
 
-**For Variant A (Claude Code):** Write the complete evaluation to `docs/research/03-prototype-evaluation.md`. Include all 8 tasks for all 3 personas, the synthesis, language audit, SUS table, and priority recommendations. Then report the SUS scores and top 3 recommendations.
+**For Variant A (code-aware):** Write the complete evaluation to `docs/research/03-prototype-evaluation.md`. Include all 8 tasks for all 3 personas, the synthesis, language audit, SUS table, and priority recommendations. Then report the SUS scores and top 3 recommendations.
 
 **For Variant B (General LLM):** Output the full evaluation inline. Follow the output format:
 ```

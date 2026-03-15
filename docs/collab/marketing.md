@@ -57,4 +57,4 @@ Three layers of proprietary IP — observation, taxonomy, collaboration — desi
 
 ## Additional Context
 
-For brand voice guidelines, campaign planning, content creation frameworks, competitive analysis, and performance analytics, see the marketing toolkit in `claude-knowledge-work/marketing-plugin/`.
+For brand voice guidelines, campaign planning, content creation frameworks, competitive analysis, and performance analytics, see the marketing toolkit in `knowledge-work/marketing-plugin/`.

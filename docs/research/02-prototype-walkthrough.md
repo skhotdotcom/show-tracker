@@ -117,7 +117,7 @@ This is a different micro pattern from the Watch loop. The system transitions fr
 
 ### 8. Overall Assessment
 
-> "Really interesting the way Claude Code laid out the page. Not what I was expecting for a micro component pattern."
+> "Really interesting the way the page was laid out. Not what I was expecting for a micro component pattern."
 
 The prototype exceeded expectations for a first pass. The dark theme, single-card focus, and conversational response language all landed. The issues are discoverability, language precision, and TV logic — all fixable without rearchitecting.
 
@@ -153,7 +153,7 @@ What happens after "This is the one"? Tracking, rating, completion detection.
 
 ### From the Process
 - **Design critique skill works** — structured feedback across usability, hierarchy, consistency, accessibility
-- **The prompt matters more than the code.** The original prompt didn't specify the response language taxonomy — Claude Code improvised. The next iteration should be more specific about the emotional job layer.
+- **The prompt matters more than the code.** The original prompt didn't specify the response language taxonomy — the build improvised. The next iteration should be more specific about the emotional job layer.
 - **Dark theme is the right call** for evening/lean-back content discovery
 
 ---

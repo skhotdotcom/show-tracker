@@ -56,7 +56,7 @@ Living context docs where each cross-functional audience has a self-contained fi
 
 ## Additional Context
 
-For account research, call preparation, competitive intelligence, asset creation, and outreach frameworks, see the sales toolkit in `claude-knowledge-work/sales-plugin/`.
+For account research, call preparation, competitive intelligence, asset creation, and outreach frameworks, see the sales toolkit in `knowledge-work/sales-plugin/`.
 
 ---
 
