@@ -10,7 +10,7 @@ Strategic container for the Show Tracker initiative. Filled first — the Lean P
 
 What are we trying to achieve in the immediate term?
 
-**Build a reusable behavioral calibration module for AI-assisted content discovery.** Not a show tracker — a system that learns from individual response patterns, not aggregate data. Extractable as standalone IP for streaming platforms, recommendation engines, and AI-powered customer experiences.
+**Build a reusable module of interaction patterns that gives customers more control over what they spend their time and attention on.** A behavioral calibration system that learns from individual response patterns, not aggregate data. Designed as components that adapt across platforms — streaming services, recommendation engines, AI-powered customer experiences. Target SUS: 92 (top 10%).
 
 ---
 

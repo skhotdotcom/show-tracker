@@ -44,13 +44,18 @@ _Last updated: 2026-03-15_
 | What | State | Notes |
 |------|-------|-------|
 | Main app (Classic, Timeline, Session) | Shipped | 3 views, SUS 75.0 |
-| Observation prototype | Built + tested | SUS 74.2, 3 persona eval complete |
+| Observation prototype | Built + tested | SUS 74.2 (target: 92), 3 persona eval complete |
 | Response language | Validated, not yet implemented | 8 labels → 5 based on natural language clustering |
+| Reusable interaction pattern module | Backlog | Multi-use components adaptable across platforms |
 | Language capture variant | Built + tested | 30 responses clustered into 6 intent categories |
 | Collaboration docs | Active | All 5 audience docs updated with IP framing |
 | Design system tokens | Not yet | Needed for engineering consistency |
 
+**Target:** SUS 92 (top 10% of all SUS scores). Current: 74.2.
+
 **Next:** Update response language in prototype (8 → 5), design "I'm in" exit behavior, add design system tokens for engineering.
+
+**Backlog:** Poster discoverability, personal score reasoning, silent action confirmations, TV logic (new-to-show vs. tracking cards), tracking mode for ongoing shows.
 
 **Blocked:** —
 

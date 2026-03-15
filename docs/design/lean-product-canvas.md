@@ -10,7 +10,7 @@ Product-level canvas for the observation layer — the highest-priority IP layer
 
 People choose what to watch based on energy, mood, and context — but recommendation engines only know ratings, genre, and availability. The gap: the algorithm doesn't know you're eating dinner, you're tired, and RPDR is a no-brainer in that context, while Star Trek requires more attention than it gets credit for.
 
-This problem exists across all content platforms, not just show tracking. The observation layer is the bridge.
+This problem exists across all content platforms, not just show tracking. The observation layer is the bridge — a reusable module of interaction patterns that adapts across platforms and gives customers control over their time and attention.
 
 ---
 
