@@ -1,10 +1,12 @@
 # Show Tracker
 
-A local-first app for tracking what you watch — and a living case study in AI-assisted prototyping. Built with Next.js, SQLite, and TMDB. AI features powered by a local LLM via LM Studio.
+A local-first app for tracking what you watch — and a reusable module for AI-assisted content discovery. Built with Next.js, SQLite, and TMDB. AI features powered by a local LLM via LM Studio.
+
+**Note:** This is a research prototype. The observation layer and interaction patterns are designed to be extracted as a standalone module for integration into streaming platforms, recommendation engines, and AI-powered customer experiences.
 
 ---
 
-## Case Study: The Prototype as a Learning System
+## The Prototype as a Learning System
 
 This project started as a personal show tracker and evolved into something more: a research instrument for understanding how people choose what to watch.
 
@@ -26,7 +28,7 @@ The research instrument: one card at a time, emotional response labels, behavior
 | Suggestion card + responses | Preview dialog | Language capture variant |
 |:---:|:---:|:---:|
 | ![Observation card](docs/images/observation-card.png) | ![Preview dialog](docs/images/observation-preview.png) | ![Language capture](docs/images/language-capture.png) |
-| "How do you feel about this one?" — 8 response options across 3 intent categories, revision history below | Poster click opens cast, backdrop, extended description — the "tell me more" moment | Open-text variant for UX writing research — natural language clustered into intent categories |
+| "How do you feel about this one?" — 8 response options across 3 intent categories, revision history below | Poster click opens cast, backdrop, extended description — the "tell me more" moment | Open-text variant for natural language clustering |
 
 ### The Pipeline
 
@@ -53,7 +55,7 @@ The feedback loop: **observe → learn → calibrate → anticipate**. The same 
 | **Real User Test** | Solo walkthrough of 10 suggestions. Found: response language doesn't match mental model, poster lightbox undiscoverable, TV episode logic broken. | [02-prototype-walkthrough](docs/research/02-prototype-walkthrough.md) |
 | **Synthetic Eval** | 3-persona evaluation of observation prototype (SUS avg 74.2). Cross-persona language audit. | [03-prototype-evaluation](docs/research/03-prototype-evaluation.md) |
 | **Language Test** | Built open-text variant. 30 synthetic responses clustered into 6 intent categories. Recommended reducing labels from 8 to 6. | [04-language-test](docs/research/04-language-test.md) |
-| **Taxonomy** | Defined the interaction pattern / component / experience distinction. Mapped behavioral signal stack. Connected to course + article writing. | [taxonomy](docs/design/taxonomy.md) |
+| **Taxonomy** | Defined the interaction pattern / component / experience distinction. Mapped behavioral signal stack. | [taxonomy](docs/design/taxonomy.md) |
 
 ---
 
@@ -80,7 +82,7 @@ docs/
   prompts/                               # Reusable AI prompts and build recipes
     build-observation-prototype.md       # Build prompt for observation prototype
     run-prototype-evaluation.md          # Eval prompt (Claude Code + general LLM variants)
-  images/                                # Screenshots for case study and docs
+  images/                                # Screenshots for research and documentation
 ```
 
 ### How this works as a system
@@ -248,5 +250,26 @@ docs/
   design/                   # Strategy briefs, frameworks, thinking notes
   collab/                   # Living context docs — one per collaborator audience
   prompts/                  # Reusable AI prompts and build recipes
-  images/                   # Screenshots for case study and docs
+  images/                   # Screenshots for research and documentation
 ```
+
+---
+
+## License
+
+**© 2026 Scott Purcell. All rights reserved.**
+
+This repository contains proprietary research, interaction patterns, design frameworks, and documentation. The code and documentation are shared for viewing and reference purposes only.
+
+**Limited permission is granted to:**
+- View and reference the code and documentation for personal learning
+- Fork the repository for private evaluation purposes
+- Cite or excerpt portions of the documentation with attribution
+
+**Not permitted without written consent:**
+- Commercial use of the interaction patterns, taxonomy, or research methodology
+- Redistribution of the code, documentation, or design artifacts
+- Incorporation into commercial products or services
+- Publication of derivative works based on the research or frameworks
+
+**TMDB Attribution:** This product uses the TMDB API but is not endorsed or certified by TMDB. TMDB logo and data are property of The Movie Database (themoviedb.org).
