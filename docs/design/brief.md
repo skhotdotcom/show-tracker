@@ -159,7 +159,7 @@ Why: Hunger Games, Devil Wears Prada — Scotty wants to know, not search for it
 
 ---
 
-## Prototype Architecture (for AI Prototyping Course)
+## Prototype Architecture
 
 ### Phase 1: Context-Aware Recommendation
 - **Input:** Time of day, day of week, active shows, last watched
@@ -192,16 +192,6 @@ Why: Hunger Games, Devil Wears Prada — Scotty wants to know, not search for it
 5. **Air day +1 pattern:** Should this be a user setting ("I always watch the day after") or inferred from behavior?
 
 ---
-
-## For the Maven Case Study
-
-This is the AI Prototyping pipeline in action:
-
-1. **Observe** (live conversation, not surveys) → watched Scotty do 20 minutes of mental inventory
-2. **Extract JTBD** (M1–M7) → broke the vague "track my shows" into 7 testable micro-jobs
-3. **Map to current state** → where does the app work, where does it break?
-4. **Design prototype features** (P1–P6) → each one solves a specific micro-job
-5. **Define success metrics** → observable, not aspirational
 6. **Iterate** → test with SUS + cognitive walkthrough (already proven with Rounds 1–3)
 
 The insight that powers everything: **ratings don't capture energy-based selection.** The algorithm needs to know not just what you like, but when you like it.

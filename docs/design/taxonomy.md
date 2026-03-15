@@ -1,6 +1,6 @@
 # Interaction Pattern Taxonomy — Show Tracker
 
-_Thinking notes from Scotty, 3/15. Keepers for course and article writing._
+_Thinking notes from Scotty, 3/15. Design research documentation._
 
 ---
 
@@ -36,7 +36,7 @@ When a team (or solo operator) says "we should build X," the taxonomy forces thr
 
 Alone or in a group, this language prevents the fuzzy idea problem: "let's add something for tracking shows you've tried." That's not a spec — it's a vibe. The taxonomy turns vibes into testable statements.
 
-**Pattern taxonomy is strong, but the language goes bigger:** This same structure works for articles (claim → evidence → insight), courses (learning objective → exercise → assessment), and hiring (behavior → signal → question). It's a reusable scoping pattern for organizing fuzzy information into meaning.
+**Pattern taxonomy is strong, but the language goes bigger:** This same structure works for organizing any fuzzy information domain: claims (evidence → insight), learning (objective → exercise → assessment), hiring (behavior → signal → question). It's a reusable scoping pattern for turning vague ideas into testable statements.
 
 ---
 
@@ -150,7 +150,7 @@ Scotty's instinct: there's a thought about social and rated content.
 - **Ratings** change the emotional job from "relief" (pick for me) to "curiosity" (everyone says this is good) or "skepticism" (high ratings, but is it for me?)
 - **Social signals** change the emotional job from "permission" (I'm interested) to "belonging" (everyone's watching this) or "FOMO" (I should catch up)
 
-This connects to the Maven course and the Pull > Push philosophy — ratings are push data (external opinion imposed on you), while behavioral signals are pull data (your own patterns surfacing what fits you).
+This connects to the Pull > Push philosophy — ratings are push data (external opinion imposed on you), while behavioral signals are pull data (your own patterns surfacing what fits you).
 
 **Open question:** Should the Show Tracker prototype eventually incorporate social/rated signals, or is the energy-aware behavioral model enough for v1? And does adding ratings undermine the "relief" emotional job by introducing decision fatigue?
 
@@ -286,22 +286,6 @@ Observation (what they do)
 The taxonomy doesn't come from interviews or surveys. It comes from the prototype observing the signal exchange between suggestion and response. The patterns are validated by whether the user follows the recommendation or not.
 
 **This is the macro pattern for the entire system:** observe → learn → calibrate → anticipate.
-
----
-
-## For the Course and Articles
-
-### Course Module Connection
-- **Pattern taxonomy** = Module 2 material (JTBD → Interaction Patterns)
-- **Behavioral signals vs. inferred states** = Module 3 (Research Synthesis)
-- **Emotional job layer** = Module 4 (Experience Design)
-- **Decision tree** = Module 5 (Feature Prioritization)
-- **Social/rated content tension** = Module 6 (Ethical Design / Algorithm Design)
-
-### Article Connection
-- "The Scope Decision Is the AI Strategy Decision" — pattern taxonomy as scoping tool
-- "Design Culture Determines AI Outcomes" — emotional job research as cultural indicator
-- New article idea: **"Features Are Dead. Long Live Interaction Patterns."** — the language problem in AI prototyping
 
 ---
 
