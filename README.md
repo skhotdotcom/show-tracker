@@ -10,7 +10,25 @@ This project started as a personal show tracker and evolved into something more:
 
 The core insight came from observation, not surveys. Watching someone do 20 minutes of mental inventory — "I think I'm caught up on Mobland, did a new Pitt drop?" — revealed that **ratings don't capture energy-based selection**. The algorithm knows air dates and ratings. It doesn't know you're eating dinner, you're tired, and RPDR is a no-brainer in that context.
 
-The prototype pipeline:
+### The App
+
+Three views, each a different mental model for the same library:
+
+| Classic — status buckets | Timeline — urgency + schedule | Session — "what should I watch?" |
+|:---:|:---:|:---:|
+| ![Classic view](docs/images/classic-view.png) | ![Timeline view](docs/images/timeline-view.png) | ![Session view](docs/images/session-view.png) |
+| Watch Patterns, Continue Watching, Watch Next, History | Now carousel with urgency badges, This Week air dates | Ranked suggestions with reason text, Available grid |
+
+### The Observation Prototype
+
+The research instrument: one card at a time, emotional response labels, behavioral logging.
+
+| Suggestion card + responses | Preview dialog | Language capture variant |
+|:---:|:---:|:---:|
+| ![Observation card](docs/images/observation-card.png) | ![Preview dialog](docs/images/observation-preview.png) | ![Language capture](docs/images/language-capture.png) |
+| "How do you feel about this one?" — 8 response options across 3 intent categories, revision history below | Poster click opens cast, backdrop, extended description — the "tell me more" moment | Open-text variant for UX writing research — natural language clustered into intent categories |
+
+### The Pipeline
 
 1. **Observe** — Live conversation analysis, not surveys. Extracted 7 micro-jobs (JTBD) from how someone actually talks about their shows.
 2. **Build** — Each micro-job became a testable interaction pattern. "Tonight's Pick" solves the dinner decision. "Mark Through" solves the binge logger. "On Radar" solves uncommitted interest.
@@ -53,9 +71,11 @@ docs/
   design/                                # Strategy, briefs, frameworks
     brief.md                             # JTBD analysis, energy model, prototype specs (P1-P6)
     taxonomy.md                          # Interaction pattern / component / experience distinction
+    handoff.md                           # Cross-functional considerations (product, eng, design, marketing, sales)
   prompts/                               # Reusable AI prompts and build recipes
     build-observation-prototype.md       # Build prompt for observation prototype
     run-prototype-evaluation.md          # Eval prompt (Claude Code + general LLM variants)
+  images/                                # Screenshots for case study and docs
 ```
 
 ### How this works as a system
@@ -221,4 +241,5 @@ docs/
   research/                 # Numbered test findings (01-, 02-, ...)
   design/                   # Strategy briefs, frameworks, thinking notes
   prompts/                  # Reusable AI prompts and build recipes
+  images/                   # Screenshots for case study and docs
 ```
