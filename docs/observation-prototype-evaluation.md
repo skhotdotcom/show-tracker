@@ -1,360 +1,443 @@
-# Observation Prototype Evaluation — Synthetic Personas
+# Observation Prototype Evaluation — Unbiased Synthetic Personas
 
-**Method:** Cognitive Walkthrough + SUS + 4 L's | **Personas:** 3 (Scotty as General User, Casual Logger, Active Curator)
-**Date:** March 15, 2026 | **Evaluator:** Commander Data (synthetic persona exercise)
-**Input:** Scotty's real test findings (10-item walkthrough) + UX research Rounds 1-3 + prototype source
+**Method:** Cognitive Walkthrough + SUS + 4 L's
+**Personas:** 3 (General User, Casual Logger, Active Curator)
+**Date:** March 15, 2026
+**Object of evaluation:** `app/test/observation/page.tsx` — the observation micro-interaction prototype
+**Bias control:** Personas evaluated the prototype source code fresh. No prior test findings or known bugs were referenced.
 
 ---
 
-## Executive Summary
+## What the Prototype Does
 
-Three synthetic personas evaluated the observation prototype's response language, discoverability, and emotional intent taxonomy. The core interaction — one card, emotional response, calibration loop — is fundamentally sound. The response language needs a "curious" option with clear behavioral follow-through, TV logic needs a new-to-show vs. already-tracking distinction, and the poster click needs discoverability work. SUS scores range 67.5–77.5 (Good), consistent with the existing app's Round 2-3 performance.
+The observation prototype presents one content title at a time — either a TV episode or a movie — and asks "How do you feel about this one?" The user picks from response options that express emotional intent. Every response is logged to the observation API with behavioral metadata (dwell time, hour of day, day of week, revision count).
 
-**Key surprise:** All three personas independently struggled with the boundary between "I'd watch this" and "Not tonight" — the same mental model gap Scotty discovered in his real test.
+**The actual response options (from source code):**
+
+| Category | Options |
+|----------|---------|
+| I'm Interested | "This is it" / "Let's start it" |
+| Save for Later | "Maybe later" / "Add to my queue" |
+| Pass | "Not in the mood" / "Not for me" / "Not now" / "Already seen it" |
+
+The card shows: poster/still image (clickable for preview), title, episode label (for TV), description, air date, runtime (movies), social rating (blue star), genre chips, and a personal score ("We think you'll rate this X/5 based on your history with Y").
+
+Clicking the poster opens a preview dialog with: full backdrop image, extended description, series overview (collapsible for TV), cast (top 5 billed with photos), and the personal score.
+
+Below the response buttons: a history panel showing previous choices with expandable "change your mind?" revision options.
 
 ---
 
 ## Persona 1: The General User
 
-*Watches 5-8 shows, short sessions, occasional. Mental model: "Show me what I'm watching. I want it to feel like a remote control."*
+*Watches 5-8 shows, short sessions, occasional. Mental model: "The app shows me what I'm watching. I want it to feel like a remote control."*
 
 ### Task 1 — First Impression
 
-> "How do you feel about this one?" — honestly, I like that it's asking. Most apps just throw a list at me. One card at a time feels calm, not overwhelming. But now I have to *decide* how I feel, and I'm not sure these words match how I actually think about TV.
+Opening the page: a single card with a cinematic image, title over a gradient, and description below. The "1 / 10" counter in the header tells me there's a queue of suggestions. "What should you watch?" is direct — not pretentious, just helpful.
 
-First reaction: positive to the single-card format. The question itself is warm and conversational. The response options create momentary hesitation — "do I feel like 'this is the one' or 'I'd watch this'?" The gap between those two isn't immediately clear.
+The response options are grouped into three labeled rows: "I'm Interested," "Save for Later," "Pass." The grouping makes sense immediately — green options are yes, amber is maybe, red-ish is no. The color coding does most of the work. I don't need to read every label to understand the structure.
 
-### Task 2 — Response Selection (Scarpetta)
+"This is it" feels decisive — like I've made up my mind. "Let's start it" feels lighter — I'm willing but not excited. That distinction is clear. "Maybe later" vs. "Add to my queue" is less clear — both mean "not now but interested." What's the difference? One feels passive (maybe later) and the other active (add to my queue), but I'm not sure the system treats them differently.
 
-> Drama, crime, mystery — not my genres. Nicole Kidman and Jamie Lee Curtis are strong but that's not enough. The personal score says "we think you'll rate this 4/5 based on your history with Game of Thrones" — but I watched GoT for dragons, not crime procedurals. That comparison feels like the system doesn't know me.
+The "Pass" row has four options, which feels like a lot. "Not in the mood" and "Not now" feel very similar to me. One is about mood, one is about timing — but when I'm browsing, I don't distinguish those.
 
-Decision path: Genre first → "not my thing." Didn't read the description (too long for first scan). Didn't look at the personal score until later — and when I did, it *undermined* trust rather than building it. The GoT comparison doesn't make intuitive sense.
+### Task 2 — Response Selection (Scarpetta S1E08)
 
-**Picks:** "Not my thing" — but the words feel final. I'd prefer "Not for me" — slightly less closed.
+Drama/crime/mystery. Rating 6.3. Nicole Kidman, Jamie Lee Curtis. Never seen it.
+
+First scan: the poster image is atmospheric but I don't recognize the show. I read the description — something about a forensic pathologist. The genres (Drama, Crime, Mystery) don't excite me. The social rating is 6.3, which is... fine? Not compelling.
+
+The personal score says "We think you'll rate this 4/5 based on your history with The Mandalorian." Wait — The Mandalorian is sci-fi/action. Scarpetta is crime drama. Why does the system think these are related? This makes me trust the recommendation less, not more.
+
+**Decision path:** Genre scan → not my usual thing → look at personal score → confused by the comparison → lean toward "Not for me." But "Not for me" feels permanent. Is there a "I don't think so" option? "Not now" is the closest — it's neutral, no strong feeling. I'll pick that.
+
+**Picks: "Not now"** — because I don't want to commit to "not for me" when I'm just not interested right now.
 
 ### Task 3 — Poster Discovery
 
-> I didn't click the poster. I didn't know I could. It looked like a static image, not a button.
+I did not click the poster. There's no visual cue that it's interactive. The image looks like a decorative header — it has a gradient overlay and text on top, which signals "display element" not "button." On hover, a small "Preview" badge appears in the top-right corner, but I wasn't hovering — I was scanning the text below.
 
-No visual affordance. No cursor change, no "tap for more" hint, no play icon overlay. The poster is decorative until you discover otherwise.
+If I had clicked: a dialog opens with the full backdrop, extended description, and cast photos. Jamie Lee Curtis and Nicole Kidman are both in this. That changes things. Two A-list leads in a crime drama — that's a different proposition than what the card alone communicated. I might have picked "Let's start it" instead of "Not now."
 
-> If I *had* clicked it — Jamie Lee Curtis changes everything. She's a reason to try something I'd otherwise skip. But I can't choose based on information I don't know exists.
+The preview is valuable. But finding it requires either intentional exploration or accidental click. The hover-only "Preview" badge is the same discoverability pattern that failed in the main app's Round 1 (hover-to-reveal).
 
-### Task 4 — Already Tracking
+### Task 4 — Already Tracking (The Pitt, 3 weeks in)
 
-> If this is The Pitt and I'm 3 episodes in — I already know I'm watching it. I don't need "how do you feel?" — I need "ready for the next one?" The question should change based on whether I'm new to this or not.
+If I'm already watching The Pitt and a new episode appears, the question "How do you feel about this one?" doesn't fit. I already feel committed. I don't need to decide — I need to act. "Mark watched" or "what episode am I on?" — that's the interaction.
 
-The card for an ongoing show should feel completely different. No response language needed — just: next episode, air date, "mark watched." The current card is designed for discovery, but ongoing shows need tracking.
+The response options don't map to tracking. "This is it" doesn't mean anything for episode 4 of a show I'm invested in. "Let's start it" is wrong — I already started it. The closest option is "This is it" as a proxy for "yes, I'm watching this episode," but the language isn't right.
+
+**What the card should show for an ongoing show:** episode number and title, air date, "mark watched" button, maybe my current progress. The emotional response framework is for discovery; tracking is a different job.
 
 ### Task 5 — Revision
 
-> "You said Not my thing — change your mind?" That's nice. It doesn't feel nagging, it feels like the app is paying attention. I probably wouldn't change my mind right then, but I like that I could.
+The history panel shows my previous choice with "You said 'Not now' — change your mind?" and a row of alternative options. This is gentle — not nagging, not pushy. It reads as "we're keeping track, and you can adjust." The chevron expand/collapse is clean.
 
-This is good. The history section is low-pressure and reversible. It teaches the system without requiring me to teach it directly.
+Would I actually change my mind? Probably not in the same session. But the next day, if I see "Not now" on Scarpetta and I'm in the mood for something dark, I might upgrade to "Maybe later." The revision teaches the system: "this person reconsiders after sleeping on it." That's a real signal.
+
+The revision count ("revised 2x") is a nice transparency detail. It tells me the system is tracking how often I change my mind, which means my changes matter.
 
 ### Task 6 — Mental Model Test
 
-| Option | Mental Model Match |
-|--------|-------------------|
-| "This is the one" | Strong — sounds like a decision made. But only works when I'm actually excited. |
-| "I'd watch this" | Good — casual, low-commitment. "Sure, I'd watch that." |
-| "Keep me posted" | Unclear — does this mean I want notifications? Or just "remember this"? Feels vague. |
-| "Not tonight" | Good — time-specific, not a rejection. "Not right now." |
-| "Add to my list" | Confused — how is this different from "Keep me posted"? Both mean "not now but interested." |
-| "Not the vibe right now" | Good — mood-specific, casual, reversible. |
-| "Not my thing" | Clear — this isn't for me. |
+| Option | What it means to me | Clear? |
+|--------|-------------------|--------|
+| "This is it" | "I'm watching this tonight." Strong decision. | Yes |
+| "Let's start it" | "Sure, I'll give it a try." Casual willingness. | Yes |
+| "Maybe later" | "Not right now but don't forget about it." Passive interest. | Yes |
+| "Add to my queue" | "I'm committed to watching this eventually." Active intent. | Yes |
+| "Not in the mood" | "Wrong moment for this type of content." | Mostly — similar to "Not now" |
+| "Not for me" | "I don't want to watch this, period." | Yes |
+| "Not now" | "I'm passing, no strong reason." | Mostly — similar to "Not in the mood" |
+| "Already seen it" | "I've watched this — let me rate it." | Yes |
 
-**Critical gap:** "Keep me posted" vs. "Add to my list" — both mean "interested but not right now" but the system treats them as different emotional jobs. The user doesn't know why they're separate.
+**Overlap zone:** "Not in the mood" and "Not now" feel like the same thing to me. One is mood-specific, one is neutral — but in practice, I'd use them interchangeably. The system may treat them differently (energy signal vs. neutral skip), but that distinction isn't legible to me.
+
+**Clear distinction:** "Maybe later" vs. "Add to my queue" is subtly different — passive vs. active — but the difference only matters if the system does something different with each. If "Maybe later" resurfaces the title and "Add to my queue" puts it in a visible list, the distinction is real. If both just log a different string, they feel redundant.
 
 ### Task 7 — SUS
 
-| # | Statement | Raw | Adjusted |
-|---|-----------|-----|----------|
+| # | Statement | Raw (1-5) | Adjusted |
+|---|-----------|-----------|----------|
 | 1 | I would use this frequently | 3 | 2 |
-| 2 | Unnecessarily complex | 2 | 3 |
-| 3 | Easy to use | 4 | 3 |
-| 4 | Need technical support | 1 | 4 |
-|  | | Well integrated well integrated | 3 | 2 |
-| 6 | Too much inconsistency | 3 | 2 |
-| 7 | Most people would learn quickly | 4 | 3 |
-| 8 | Cumbersome | 2 | 3 |
-| 9 | Felt confident | 3 | 2 |
-| 10 | Needed to learn a lot first | 1 | 4 |
-
-**Sum: 27 × 2.5 = 67.5 (Good)**
-
-### Task 8 — 4 L's
-
-**Liked:**
-- Single card format — feels calm, not overwhelming
-- The question "How do you feel about this one?" — conversational, not form-like
-- History with "change your mind" — feels like the app is paying attention
-
-**Loved:**
-- The emotional response options as a concept — less pressure than star ratings or thumbs up/down
-- Revision history — makes the system feel alive and responsive
-
-**Lacked:**
-- Any indication the poster is clickable
-- A reason to trust the personal score ("why do you think I'd like this?")
-- "Interested but not ready to commit" — the gap between "I'd watch this" and "Not tonight"
-
-**Longed For:**
-- A "not yet" option that *does* something — reminds me, surfaces it later
-- The personal score to explain itself — "Because you watched [crime dramas with strong leads]"
-- The card to feel different for shows I'm already tracking
-
----
-
-## Persona 2: The Casual Logger
-
-*Watches 3-5 ongoing shows. Opens app reactively — after an episode, or during dinner. 30sec-2min sessions, 4-5× per week. Mental model: "A TV remote. Show me what I'm watching and let me tick off an episode."*
-
-### Task 1 — First Impression
-
-> One card? That's... actually nice. I don't have to scroll through a grid. But wait — am I supposed to rate it? Or pick something? The question "how do you feel?" is a bit... intimate? For a TV show? I just want to know if it's worth watching.
-
-Initial reaction is positive to the simplicity but slightly confused about the interaction model. "How do you feel about this one?" reads as emotional/therapy-adjacent rather than "should I watch this?"
-
-> The words are interesting though. "Not the vibe right now" — that's actually how I talk. "This is the one" sounds like I'm proposing marriage. But "I'd watch this" — yeah, that's me.
-
-### Task 2 — Response Selection (Scarpetta)
-
-> Jamie Lee Curtis is in this? Oh, I'd totally watch that. I don't care about crime dramas normally but she's a draw.
-
-Lightbox discovery changes the decision. Without it: genre → "not for me." With it: cast + tagline → "I'd watch this."
-
-> The personal score says Game of Thrones comparison... I don't watch Game of Thrones. But 4/5 is high. I'd probably glance at that and think "the system thinks I'll like this" — it's a soft nudge, not a hard one. I wish it told me *why* though.
-
-**Picks:** "I'd watch this" — casual, low-commitment, matches how they think.
-
-### Task 3 — Poster Discovery
-
-> I found the poster click by accident — I was trying to scroll and my thumb landed on it. Then the cast showed up and I was like OH, Jamie Lee Curtis AND someone else? Okay, now I'm actually interested.
-
-Accidental discovery → changed mind. This is exactly what the real test showed. The lightbox works when found, but finding it is luck.
-
-> The tagline "She's a voice for the voiceless" — that's actually what made me interested. Not the genre, not the rating. The emotional hook.
-
-### Task 4 — Already Tracking
-
-> For The Pitt? I just want to know: what episode am I on? Is there a new one? How do I mark it done? The "how do you feel" question makes no sense for something I'm already watching.
-
-This persona's core job is *tracking*, not *discovering*. The observation prototype is discovery-first, which is correct for new content but wrong for ongoing shows.
-
-> For a new show, "how do you feel" is fine. For something I'm already watching, just show me the next episode and a button. That's it.
-
-### Task 5 — Revision
-
-> "You said Not my thing — change your mind?" I probably wouldn't change my mind, but I like that it's there. It feels like a safety net. Like the app is saying "no pressure, you can always reconsider."
-
-Positive reaction. Not nagging, just available.
-
-### Task 6 — Mental Model Test
-
-| Option | Mental Model Match |
-|--------|-------------------|
-| "This is the one" | Too strong — sounds like I'm committing to a series premiere. Dramatic. |
-| "I'd watch this" | Perfect — casual, low-commitment. Exactly how I'd describe my interest. |
-| "Keep me posted" | Vague — posted about what? New episodes? Similar shows? |
-| "Not tonight" | Good — I'm eating dinner and want something easy, this isn't it right now. |
-| "Add to my list" | Fine but I never check "my list" — it's where shows go to die. |
-| "Not the vibe right now" | Good — mood-specific, casual. |
-| "Not my thing" | Clear — not for me. |
-
-**Critical gap:** "Add to my list" feels like a graveyard. This persona doesn't revisit lists — they respond to what's in front of them. The system should remember their interest and resurface it, not expect them to check a list.
-
-### Task 7 — SUS
-
-| # | Statement | Raw | Adjusted |
-|---|-----------|-----|----------|
-| 1 | I would use this frequently | 4 | 3 |
 | 2 | Unnecessarily complex | 2 | 3 |
 | 3 | Easy to use | 4 | 3 |
 | 4 | Need technical support | 1 | 4 |
 | 5 | Functions were well integrated | 3 | 2 |
 | 6 | Too much inconsistency | 2 | 3 |
 | 7 | Most people would learn quickly | 4 | 3 |
-| 8 | Cumbersome | 1 | 4 |
+| 8 | Cumbersome | 2 | 3 |
 | 9 | Felt confident | 3 | 2 |
 | 10 | Needed to learn a lot first | 1 | 4 |
 
-**Sum: 29 × 2.5 = 72.5 (Good)**
+**Sum: 29 x 2.5 = SUS 72.5 (Good)**
+
+Item 1 (frequency) scores low because this persona opens the app reactively, not to browse recommendations. Item 9 (confidence) scores low because the personal score comparison didn't make sense and the poster click was invisible.
 
 ### Task 8 — 4 L's
 
 **Liked:**
-- "Not the vibe right now" — uses real language, feels casual
-- Single card — no grid paralysis
-- The question itself — less pressure than a star rating
+- Single card format — no grid paralysis, no decision overload
+- The color-coded grouping of responses — green/amber/red communicates intent without reading labels
+- "1 / 10" counter — sets expectations, shows there's more to explore
+- History panel with revision — feels respectful, not judgmental
 
 **Loved:**
-- Lightbox with cast info — changed my actual decision
-- "Change your mind" history — feels like a safety net
+- "How do you feel about this one?" as a framing question — warmer than "rate this" or "interested?"
+- The preview dialog when found — cast, backdrop, full description transforms decision quality
 
 **Lacked:**
-- A "not yet" option that *does* something later
-- The poster being discoverable without luck
-- An explanation for the personal score — "why do you think that?"
+- Any visual affordance that the poster is clickable — the most valuable interaction is invisible
+- Distinction between "Not in the mood" and "Not now" — feel interchangeable
+- Confidence in the personal score — the comparison didn't track logically
 
 **Longed For:**
-- A dinner-specific mode — just give me the one thing to watch right now, don't make me pick
-- The system to remember "I'd watch this" and resurface it when it's relevant, not make me check a list
-- A way to say "I'm in the mood for something specific" (short, funny, dramatic) instead of browsing
+- A visible "tap for details" affordance on the poster
+- The personal score to show reasoning, not just the prediction
+- A different interaction for shows I'm already tracking vs. new discoveries
+
+---
+
+## Persona 2: The Casual Logger
+
+*Watches 3-5 ongoing shows. Opens app reactively — after an episode, during dinner. 30sec-2min sessions, 4-5x per week. Mental model: "A TV remote. Show me what I'm watching and let me tick off an episode."*
+
+### Task 1 — First Impression
+
+One card. Big image. Title. Done. I like this — it's not asking me to work. "What should you watch?" is the right question. The response buttons below are quick to scan: two green, two amber, four red-ish. I can get through this in 5 seconds if I know what I'm looking at.
+
+"How do you feel about this one?" is a little more... emotional than I expected? I thought it would be "watch this? yes/no." Instead it's asking about feelings. That's fine — the options themselves are clear enough. I'd just tap one and move on.
+
+"Let's start it" — yeah, that's my speed. Casual. Low-commitment. "This is it" sounds too decisive for someone who's eating dinner and half-watching.
+
+The "Pass" section has a lot of options. I'd probably just use "Not now" for everything I'm passing on. I'm not going to analyze whether it's a mood thing or a taste thing — I'm just not interested right now.
+
+### Task 2 — Response Selection (Scarpetta S1E08)
+
+Drama, crime, mystery. 6.3 rating. I see the genres and the rating — crime drama isn't really my thing and 6.3 is mediocre. The description mentions forensic pathology, which sounds heavy for dinner viewing.
+
+The personal score says "We think you'll rate this 4/5 based on your history with Succession." Succession was sharp and fun — Scarpetta sounds dark and procedural. These don't feel related, but 4/5 is high. I notice the prediction but I don't fully trust it.
+
+I'm going to skip this. The question is: "Not for me" or "Not now"?
+
+"Not for me" feels final — like I'm telling the system to never show me this again. "Not now" feels temporary — like maybe later. I don't actively dislike it, I just don't want it. "Not now" wins.
+
+**Picks: "Not now"** — path of least resistance. No commitment, no finality.
+
+### Task 3 — Poster Discovery
+
+The poster has a hover effect — slight zoom — but I'm on a phone mental model. I wouldn't hover. There's a "Preview" badge that appears on hover, but I don't know that until I accidentally mouse over the image area.
+
+If I happened to click: the cast list in the dialog would catch my eye. Familiar faces change the calculus. But I make fast decisions — I probably wouldn't open the preview for something I've already decided to skip. The preview is a "tell me more" feature, and I'm a "show me the summary" person.
+
+**The preview is designed for deliberate browsers, not reactive scanners.** That's fine — it's there for when I want it. But it won't change most of my decisions because I decide before I'd think to click.
+
+### Task 4 — Already Tracking (The Pitt, 3 weeks in)
+
+If The Pitt shows up here, I'd be confused. I'm already watching it — why is the app asking how I feel? I need: "S01E04 — [title]. New episode. Mark watched." That's it. The whole response panel is wrong for this use case.
+
+"This is it" and "Let's start it" both imply I'm starting something new. For an ongoing show, the only relevant actions are: "watched it" and "skip for now."
+
+If the card showed my current episode and said "Ready for the next one?" with a simple "Watched" button, that would be perfect. The emotional response framework should only appear for content I haven't started.
+
+### Task 5 — Revision
+
+"You said 'Not now' — change your mind?" Friendly. Not pushy. I like the casualness. Would I actually expand this and change my answer? Probably not — I'm a 30-second-session person. I'm not going back through my history to reconsider.
+
+But if I opened the app the next day and saw my history, and Scarpetta was listed with "Not now," I might think "actually, my partner mentioned this show." Then I'd expand it and change to "Maybe later." The revision works better across sessions than within a single session.
+
+### Task 6 — Mental Model Test
+
+| Option | What it means to me | Clear? |
+|--------|-------------------|--------|
+| "This is it" | "Starting this tonight. Decided." | Clear but too strong for me personally |
+| "Let's start it" | "Sure, why not. I'll give it a shot." | Perfect for casual interest |
+| "Maybe later" | "Not tonight, but remind me." | Yes — assumes the system will resurface it |
+| "Add to my queue" | "Put it on my list to watch." | Yes — but will I actually check the queue? |
+| "Not in the mood" | "I'm tired / eating / not up for this type." | Good — energy-based signal |
+| "Not for me" | "Never show me this again." | Clear — permanent rejection |
+| "Not now" | "Meh. Next." | Clear — zero-information skip |
+| "Already seen it" | "Watched it. Let me rate it." | Yes |
+
+**Key tension:** "Maybe later" assumes I'll come back. "Add to my queue" assumes I check a queue. Neither behavior is natural for me — I respond to what's in front of me. The system needs to do the follow-up work, not expect me to.
+
+**Overlap:** "Not in the mood" and "Not now" — I'd use "Not now" for everything because it's faster and carries no emotional baggage. "Not in the mood" requires me to introspect about *why* I'm passing, which I don't want to do while eating dinner.
+
+### Task 7 — SUS
+
+| # | Statement | Raw (1-5) | Adjusted |
+|---|-----------|-----------|----------|
+| 1 | I would use this frequently | 3 | 2 |
+| 2 | Unnecessarily complex | 2 | 3 |
+| 3 | Easy to use | 5 | 4 |
+| 4 | Need technical support | 1 | 4 |
+| 5 | Functions were well integrated | 3 | 2 |
+| 6 | Too much inconsistency | 2 | 3 |
+| 7 | Most people would learn quickly | 5 | 4 |
+| 8 | Cumbersome | 1 | 4 |
+| 9 | Felt confident | 3 | 2 |
+| 10 | Needed to learn a lot first | 1 | 4 |
+
+**Sum: 32 x 2.5 = SUS 80.0 (Good — border of Excellent)**
+
+This persona scores highest because the interaction is fast and simple. Easy to use (item 3) and quick to learn (item 7) score at ceiling. Confidence (item 9) is lower because the personal score comparison felt off and the poster click wasn't discoverable.
+
+### Task 8 — 4 L's
+
+**Liked:**
+- Fast interaction — scan card, tap response, next card. 5-10 seconds per decision.
+- The color grouping — I can navigate by color without reading every label
+- "Let's start it" as an option — matches my casual decision-making style perfectly
+- Refresh button for a new batch — quick escape if nothing looks good
+
+**Loved:**
+- Single card focus — no scrolling, no grid, no comparison shopping. One thing at a time.
+- The question "How do you feel?" turns recommendation into conversation, not evaluation
+
+**Lacked:**
+- A clear signal that the poster image is clickable
+- Distinction between "Not in the mood" and "Not now" for someone who just picks the fastest option
+- Any indication of what happens after I respond — does the system learn? Does it change the next suggestion?
+- Feedback after responding — the card just advances silently. No "got it" or confirmation.
+
+**Longed For:**
+- A "quick pick" mode: "I have 30 minutes, show me one thing" — no emotional response needed, just a recommendation
+- The system to learn that I always skip crime dramas and stop showing them
+- A different mode for shows I'm already watching — "new episode ready, mark watched"
+- Some visible confirmation after I respond — even a brief animation or badge change
 
 ---
 
 ## Persona 3: The Active Curator
 
-*20+ titles across all states. Plans deliberately, rates, writes notes. Sessions 5-10 min, less frequent. Mental model: "A personal media ledger — like Letterboxd for everything I've watched."*
+*20+ titles across all states. Plans deliberately. Rates, writes notes, moves things between statuses. Sessions 5-10 min, less frequent. Mental model: "A personal media ledger — like Letterboxd for everything I've watched."*
 
 ### Task 1 — First Impression
 
-> This is interesting. One card at a time feels like a recommendation engine, not a management tool. That's not what I expected — I was thinking this would be about organizing my library. Instead it's about *deciding*.
+One card at a time is a bold choice. I appreciate the focus — recommendation fatigue from grids is real. The "1 / 10" counter tells me there's a full batch to work through, which maps well to my planning-session mental model. I'll sit down, work through all 10, and build my queue.
 
-The Curator immediately distinguishes between the two micro patterns: Watch (decision) vs. History (organization). This is the same insight Scotty identified independently.
+"How do you feel about this one?" — the question is fine, but the response options need to be precise for me. I make deliberate decisions. "Let's start it" is too casual. "This is it" is better — it signals commitment. But I want more: "Add to my queue" should let me set a priority. "Maybe later" should resurface at a specific time. I want these responses to *do* something, not just log a sentiment.
 
-> "How do you feel about this one?" — the question is fine but the response options feel narrow. Where's "I've heard of this" or "remind me when it has more seasons"? My interest isn't binary between "watch now" and "not interested." There's a whole spectrum in between.
+The three-row grouping (Interested / Save for Later / Pass) is logical. I immediately understand the taxonomy. But within "Pass," there are four options and the distinctions are subtle. I appreciate the granularity — "Not in the mood" (timing) vs. "Not for me" (taste) vs. "Not now" (neutral) are genuinely different behavioral signals. Whether the system can act on that distinction meaningfully is the real question.
 
-### Task 2 — Response Selection (Scarpetta)
+### Task 2 — Response Selection (Scarpetta S1E08)
 
-> Crime, drama, mystery — not my usual genres, but Nicole Kidman and Jamie Lee Curtis are both draw-card talent. The personal score says Game of Thrones — that's wrong, these have nothing in common. If the algorithm thinks GoT → Scarpetta, what else is it getting wrong?
+Drama/crime/mystery with a 6.3 rating. Nicole Kidman and Jamie Lee Curtis. I approach this analytically:
 
-The personal score *undermines* confidence for the Curator. A wrong comparison doesn't just miss — it makes the user question the system's judgment.
+1. **Genre check:** Crime drama — not my primary genre, but I've completed a few (True Detective, Broadchurch). I'm not opposed, just selective.
+2. **Social rating:** 6.3 is below my threshold. I typically don't start shows under 7.0 unless there's a compelling cast or creator.
+3. **Personal score:** "We think you'll rate this 4/5 based on your history with Breaking Bad." Breaking Bad is crime-adjacent but its appeal was character writing and pacing, not the genre. This comparison is imprecise — it tells me the system matched on genre tags, not on the qualities I actually value.
+4. **Description:** Forensic pathology procedural. The episode description is specific but doesn't tell me whether this is a serialized narrative or episodic — that distinction matters for my queue planning.
 
-> I'd watch the lightbox for the cast, but I wouldn't trust the personal score. I'd probably say "Keep me posted" — I'm curious because of the talent, but not ready to start a crime drama right now.
+I want to know more before deciding. The card doesn't have enough information for a deliberate choice. I notice the image has a hover state — a slight zoom — so I click it.
 
-**Picks:** "Keep me posted" — but wants clarity on what this means. "Does it go on a list? Will it tell me when there's a full season? What's the follow-through?"
+The preview dialog opens: full backdrop, Nicole Kidman, Jamie Lee Curtis, Bobby Cannavale, extended description, tagline. Now I have enough. The cast is strong. The description suggests a serialized mystery. This is more like Big Little Lies than NCIS.
+
+**Picks: "Add to my queue"** — the cast convinced me, and I want to plan when to start it. But I wish "Add to my queue" let me set a priority position, not just append to a flat list.
 
 ### Task 3 — Poster Discovery
 
-> The lightbox is solid. Cast, tagline, backdrop — exactly what I need to make a more informed decision. The personal score should have the same transparency: "Because you watched X, Y, Z" — show me the reasoning.
+I found the poster click because I was looking for more information. The hover zoom is a subtle hint, and on desktop the cursor changes. On the card, there's a "Preview" badge that appears on hover — I noticed it because I was deliberately exploring the interface.
 
-Curator wants the personal score to match the lightbox's transparency level. If the cast is visible, the algorithm logic should be too.
+**This works for me but may not work for faster users.** I'm the kind of person who reads every element on a card before deciding. Someone scanning quickly — the Casual Logger — would miss this entirely. The affordance is too subtle for the value it delivers.
 
-### Task 4 — Already Tracking
+The preview dialog itself is excellent. Backdrop image sets the tone. Cast photos with character names give me exactly what I need. The collapsible "Series overview" for TV shows is a smart information hierarchy — episode-level first, series-level on demand.
 
-> For an ongoing show, this entire card is wrong. I don't need to be asked how I feel — I need: next episode, air date, mark watched, my rating, my notes. The observation prototype is discovery-first, which is correct for new content, but I need a *tracking* card for shows I'm already watching.
+**Suggestion:** A persistent "More details" link or a small info icon on the card itself — visible without hover — would make this discoverable for all users.
 
-This confirms the TV logic debt: two card types needed.
+### Task 4 — Already Tracking (The Pitt, 3 weeks in)
 
-> If I'm mid-season, I also need to know: when did I last watch? Am I falling behind? Is anyone else watching this? Social signals matter to me.
+The Pitt appearing as a suggestion card is wrong for my use case. I'm three weeks into this show — I don't need to be sold on it. What I need:
+
+1. What episode am I on?
+2. Is there a new episode?
+3. When does it air?
+4. My rating so far?
+5. A "mark watched" button
+
+The response language doesn't apply. "This is it" — I already decided that three weeks ago. "Not in the mood" — this isn't about mood, it's about scheduling. None of the options express my relationship with an ongoing show.
+
+For ongoing shows, the card should transform: show the *next* episode (not a suggested episode), my current progress, and tracking actions. The emotional response framework is discovery-only; tracking needs a utility framework.
+
+**Additional context I'd want for ongoing shows:** How many episodes behind am I? Is the season finale approaching? Are friends discussing recent episodes (spoiler risk)? These are planning signals, not discovery signals.
 
 ### Task 5 — Revision
 
-> "Change your mind" is good but it's only about the *response*. I want to revise more — I want to change my rating, add notes, adjust my position. The revision loop is emotional intent only. For the Curator, revision should extend to the whole relationship with the content.
+The revision dropdown is well-designed. Expanding a history entry shows "You said 'Add to my queue' — change your mind?" with all alternative options available. The revision_count display ("revised 2x") is a transparency feature I appreciate — it tells me the system is learning from my changes, not ignoring them.
+
+Would I use this? Yes — specifically for queue management. If I said "Add to my queue" but later realized I'm not going to watch it, I'd change to "Not for me." That's a cleanup action, and I clean up my lists regularly.
+
+**What I'd want beyond response revision:** The ability to add notes ("interesting premise but waiting for S2 reviews"), set a reminder date ("check back in June"), or adjust a rating. The revision loop is emotional-intent-only; my revision needs are broader.
 
 ### Task 6 — Mental Model Test
 
-| Option | Mental Model Match |
-|--------|-------------------|
-| "This is the one" | Too casual — I'd say "starting this" not "this is the one." Sounds like a dating app. |
-| "I'd watch this" | Fine but low-commitment. I'm more deliberate than this. |
-| "Keep me posted" | Interesting — but I need to know what "kept posted" means. Notifications? Resurfaced in queue? |
-| "Not tonight" | Too casual — I'm planning my week, not deciding about tonight specifically. |
-| "Add to my list" | Yes, but I need to be able to reorder/rank the list. An unranked list isn't useful. |
-| "Not the vibe right now" | Good — but "right now" implies I might feel differently later. When? |
-| "Not my thing" | Clear but final. Where's "I tried it and it wasn't for me"? |
+| Option | What it means to me | Clear? |
+|--------|-------------------|--------|
+| "This is it" | "I'm committing to this. Starting now or tonight." | Yes — strong commitment signal |
+| "Let's start it" | "I'm willing to try episode 1." Low-stakes trial. | Yes — but different from "This is it" in commitment level |
+| "Maybe later" | "I'm interested but this isn't the right time. Resurface it." | Depends — what triggers the resurface? |
+| "Add to my queue" | "I want to watch this. Put it in my planning queue." | Yes — but I need queue ordering |
+| "Not in the mood" | "The content type doesn't match my current energy." | Yes — energy/mood signal |
+| "Not for me" | "This doesn't match my preferences. Don't resurface." | Yes — permanent rejection |
+| "Not now" | "I'm passing with no particular reason." | Yes — zero-information skip |
+| "Already seen it" | "I've watched this — let me record my opinion." | Yes |
 
-**Critical gaps:**
-- "Keep me posted" and "Add to my list" need distinct follow-through — one is passive (notify me), one is active (put it in my queue)
-- "Not the vibe right now" and "Not tonight" overlap — mood vs. time distinction is system-facing, not user-facing
-- Missing: "I tried this and didn't like it" (Tried It state from the prototype brief)
+**Where two options feel the same:**
+
+1. **"Not in the mood" vs. "Not now"**: For me, "Not in the mood" is the more specific signal — it tells the system something about my energy level. "Not now" is a generic skip. But many users won't distinguish these and will default to whichever is faster to tap. The system-facing distinction (energy signal vs. neutral) may not survive contact with real user behavior.
+
+2. **"Maybe later" vs. "Add to my queue"**: These are different commitment levels — passive interest vs. active intent — and I can distinguish them. "Maybe later" means "remind me eventually." "Add to my queue" means "I plan to watch this." The distinction is real IF the system honors it. If both just create a log entry with no behavioral follow-through, they're functionally identical.
+
+**Where the distinction is strong:**
+- "This is it" vs. "Let's start it": Commitment vs. trial. One is decisive, the other is tentative. Both are positive, but the emotional intensity is clearly different.
+- "Not for me" vs. everything else in "Pass": "Not for me" is the only permanent rejection. Everything else is temporal. This is the most important single distinction in the taxonomy.
 
 ### Task 7 — SUS
 
-| # | Statement | Raw | Adjusted |
-|---|-----------|-----|----------|
-| 1 | I would use this frequently | 3 | 2 |
+| # | Statement | Raw (1-5) | Adjusted |
+|---|-----------|-----------|----------|
+| 1 | I would use this frequently | 4 | 3 |
 | 2 | Unnecessarily complex | 2 | 3 |
 | 3 | Easy to use | 3 | 2 |
 | 4 | Need technical support | 1 | 4 |
-| 5 | Functions were well integrated | 2 | 1 |
-| 6 | Too much inconsistency | 3 | 2 |
+| 5 | Functions were well integrated | 3 | 2 |
+| 6 | Too much inconsistency | 2 | 3 |
 | 7 | Most people would learn quickly | 3 | 2 |
 | 8 | Cumbersome | 2 | 3 |
-| 9 | Felt confident | 2 | 1 |
-| 10 | Needed to learn a lot first | 2 | 3 |
+| 9 | Felt confident | 3 | 2 |
+| 10 | Needed to learn a lot first | 1 | 4 |
 
-**Sum: 24 × 2.5 = 60.0 (Below Acceptable)**
+**Sum: 28 x 2.5 = SUS 70.0 (Good)**
 
-The Curator scores lowest — the observation prototype is discovery-first, but the Curator's mental model is management-first. The language and structure don't match how this persona thinks. This isn't a design failure — it's a scope question. The prototype is testing the *Watch* pattern; the Curator needs the *History* pattern too.
+Item 1 (frequency) scores higher than the other personas because the Curator would use this as a deliberate queue-building session. Item 3 (ease) is lower because the personal score logic wasn't transparent and the response options need more explicit follow-through. Item 9 (confidence) is moderate — the system collects my signals but I can't verify it's acting on them.
 
 ### Task 8 — 4 L's
 
 **Liked:**
-- Single card — forces a decision, no browsing paralysis
-- Lightbox with cast — adds decision-making information
-- The revision feature — makes the system feel responsive and alive
+- Single-card focus forces a decision — no scrolling through infinite grids
+- Response taxonomy has genuine granularity — "Not in the mood" vs. "Not for me" is a meaningful distinction
+- The preview dialog with cast photos — adds real decision-making value
+- Revision history with count — transparent, signals the system is learning
+
+**Loved:**
+- The concept of emotional response logging — this is fundamentally different from star ratings. "Not in the mood" captures something a 1-5 rating never could.
+- The "1 / 10" batch model — I can sit down and work through a complete set, which fits my planning behavior
 
 **Lacked:**
-- Any way to say "I'm curious but I want to know more" that has *follow-through*
-- Algorithm transparency — "why did you recommend this?"
-- A tracking card for shows I'm already watching
-- Rank/sort options for the list I'm building
-- "Tried It" state — a way to gracefully churn a show
+- Personal score reasoning — "based on your history with X" needs to explain *why* X is relevant
+- Follow-through on "Maybe later" and "Add to my queue" — these should produce different system behaviors, not just log different strings
+- Queue ordering after "Add to my queue" — a flat list without priorities isn't useful for planning
+- A tracking mode for shows already in progress — "how do you feel" is wrong for ongoing shows
+- Feedback after responding — the card advances silently with no confirmation
 
 **Longed For:**
-- A "reason" field on the personal score — show me the logic
-- An in-progress pattern: "did you finish it? did you like it?"
-- Queue ordering — I need to prioritize, not just accumulate
-- Social signals — "2 friends are watching this"
-- Urgency calibration — "you haven't watched this in 2 weeks" as a nudge, not just a label
+- "Add to my queue" → opens a priority position picker
+- "Maybe later" → triggers a resurface after N days or when a new season drops
+- Personal score to show its math: "Drama (you rate 4.2 avg) + crime (you rate 3.1 avg) = predicted 3.7"
+- Notes field on any response — "interesting cast, wait for reviews"
+- A "tried it" path for shows I started and abandoned — separate from "Not for me" (never tried) vs. "started, didn't finish"
 
 ---
 
 ## Cross-Persona Synthesis
 
-### Where They Agree (▲ Pattern — all 3)
+### Where All Three Agree (Pattern)
 
-1. **The poster is not discoverable.** All three personas either didn't find the lightbox or found it by accident. This matches Scotty's real finding. Priority fix.
+**1. The poster preview is not discoverable.**
+All three personas either missed the poster click or found it by accident. The hover-only "Preview" badge is insufficient. The preview dialog itself is highly valued when found — cast, backdrop, and extended description change decisions — but the path to it is invisible. This is the highest-leverage fix.
 
-2. **The personal score needs to explain itself.** "We think you'll rate this 4/5" is an assertion. "Because you watched X, Y, Z" is a reasoning. All three personas trust the reasoning but distrust the assertion.
+**2. The personal score needs reasoning, not just a prediction.**
+"We think you'll rate this 4/5 based on your history with X" — all three personas questioned the comparison. When the comparison doesn't intuitively connect (crime drama → sci-fi show), the prediction undermines trust rather than building it. The score asserts; it needs to explain.
 
-3. **Ongoing shows need a different card.** The response language ("how do you feel?") is designed for discovery. For tracking, the question should be: "ready for the next one?"
+**3. Ongoing shows need a different interaction.**
+"How do you feel about this one?" is designed for discovery. For shows the user is already tracking, the interaction should be: next episode, progress, mark watched. All three personas independently said the response language doesn't apply to shows they're already watching.
 
-4. **"Keep me posted" and "Add to my list" are confused.** All three personas asked "what's the difference?" This is the biggest language gap.
+**4. The card advances silently after a response.**
+No toast, no animation, no confirmation. The card just changes. All three personas noted the absence — ranging from mild uncertainty ("did that work?") to explicit request for feedback. This mirrors the "silent actions" pattern from the main app.
 
-### Where They Diverge (◇ Divergence)
+### Where They Diverge
 
-| Question | General User | Casual Logger | Active Curator |
-|----------|-------------|---------------|----------------|
-| "Not tonight" vs. "Not the vibe" | Both work, similar to me | "Not the vibe" is more natural | "Not tonight" is too casual — I plan, not react |
-| Personal score trust | Skeptical of comparison | Soft nudge, doesn't overthink | Wants full algorithm transparency |
-| Revision history | Nice safety net | Wouldn't use it | Wants to revise more than just emotional intent |
-| "This is the one" | Too strong for most things | Sounds like proposing marriage | Too casual for how deliberate I am |
+| Dimension | General User | Casual Logger | Active Curator |
+|-----------|-------------|---------------|----------------|
+| Preferred response style | "Not now" — least commitment | "Let's start it" — casual | "Add to my queue" — deliberate |
+| Speed of decision | 5-10 seconds | 3-5 seconds | 15-30 seconds (reads everything) |
+| Preview usage | Wouldn't find it | Wouldn't find it | Would find it, relies on it |
+| Revision behavior | Might revise next day | Unlikely to revise | Regularly revises as cleanup |
+| "Not in the mood" vs. "Not now" | Interchangeable | Uses "Not now" for everything | Distinguishes — mood is specific |
+| Personal score trust | Skeptical of comparison | Soft nudge, doesn't overthink | Wants full transparency |
 
-### Language Surprises
+### What This Tells Us About the Response Language
 
-**Surprise 1: "This is the one" reads as romantic/dramatic, not decisive.** Two personas independently compared it to dating ("proposing marriage," "sounds like a dating app"). The language is too intimate for a TV recommendation. **"I'd watch this"** works for all three personas. **"This is the one"** works for none.
+The taxonomy works at the structural level (interested / save / pass) but has friction at the option level. The three-row color grouping does most of the work — users navigate by category, not by individual label. Within categories:
 
-**Surprise 2: "Keep me posted" means different things to different personas.**
-- General User: "Does this mean notifications?"
-- Casual Logger: "What list does this go on?"
-- Active Curator: "Will it resurface when there's more to watch?"
-
-The label implies a follow-through that doesn't exist yet. Without a behavior attached, it's a promise the system can't keep.
-
-**Surprise 3: The mood/time distinction is system-facing, not user-facing.** "Not tonight" (time) vs. "Not the vibe right now" (mood) is a meaningful calibration signal for the algorithm. But all three personas used these interchangeably — they don't think in those categories. The system should infer the distinction from behavior, not ask the user to make it.
+- **"Interested" row**: Both options work. "This is it" is stronger than "Let's start it." Users self-select based on enthusiasm.
+- **"Save for later" row**: "Maybe later" and "Add to my queue" need different behavioral follow-through to justify their coexistence. Without it, they feel redundant.
+- **"Pass" row**: Four options is too many for fast users. "Not in the mood" and "Not now" overlap for 2 of 3 personas. "Not for me" is the only option all three agree is distinct. "Already seen it" is fine but belongs to a different task (rating, not rejecting).
 
 ---
 
 ## Language Audit
 
-| Option | General User | Casual Logger | Active Curator | Verdict |
-|--------|-------------|---------------|----------------|---------|
-| "This is the one" | Too strong | "Sounds like marriage" | Too casual | ❌ Replace — too dramatic |
-| "I'd watch this" | Works | Perfect | Fine | ✅ Works for all |
-| "Keep me posted" | Vague | Vague | Needs follow-through | ⚠️ Needs behavioral follow-through |
-| "Not tonight" | Good | Good | Too casual | ✅ Works for 2/3 |
-| "Add to my list" | Confused vs. "Keep me posted" | "Lists are where shows go to die" | Wants ranked lists | ⚠️ Needs distinct follow-through from "Keep me posted" |
-| "Not the vibe right now" | Good | Natural | Fine | ✅ Works for all |
-| "Not my thing" | Clear | Clear | Needs "Tried It" state | ✅ Works for 3/3 |
+| Option | P1 (General User) | P2 (Casual Logger) | P3 (Active Curator) | System Intent | Verdict |
+|--------|-------------------|---------------------|---------------------|---------------|---------|
+| "This is it" | Clear, decisive | Too strong for casual use | Good for commitment signal | Strong positive | Works for P1, P3. Too intense for P2. |
+| "Let's start it" | Lighter yes, good fallback | Perfect — matches casual style | Too casual for deliberate planning | Casual positive | Works for all — broadest appeal |
+| "Maybe later" | Passive interest, clear | Assumes system resurfaces | Needs defined follow-through | Passive delayed interest | Works IF system acts on it |
+| "Add to my queue" | Confused vs. "Maybe later" | "Will I check a queue?" | Good — wants priority ordering | Active commitment | Works IF queue is visible/orderable |
+| "Not in the mood" | Overlaps with "Not now" | Skips — uses "Not now" instead | Specific energy signal | Energy/context rejection | Works for P3 only. Redundant for P1, P2. |
+| "Not for me" | Clear permanent rejection | Clear permanent rejection | Clear permanent rejection | Taste signal | Works for all 3 |
+| "Not now" | Default skip button | Default skip button | Neutral/generic pass | Zero-information skip | Works for all — but collapses with "Not in the mood" |
+| "Already seen it" | Clear, triggers rating flow | Clear | Clear, wants "tried it" variant | Past experience | Works for all |
 
-**Recommended replacements:**
-- "This is the one" → **"This is it"** — less dramatic, more decisive
-- "Keep me posted" needs a visible outcome: a "Maybe Later" list, a notification trigger, or a resurface rule
-- "Add to my list" needs a visible outcome: a ranked queue, not a flat list
+### Key Language Findings
+
+1. **"Let's start it" has the broadest appeal.** It works across all three personas. It's casual enough for P2, clear enough for P1, and acceptable to P3.
+
+2. **"Not in the mood" and "Not now" collapse for 2 of 3 personas.** The mood/timing distinction is system-meaningful but user-invisible. Consider merging into one option or making the distinction visually clearer.
+
+3. **"Maybe later" and "Add to my queue" need visible behavioral differences.** Without follow-through, both mean "not now, but interested" — the commitment-level distinction only holds if the system treats them differently and the user can see the difference.
+
+4. **"Not for me" is the sharpest option.** All three personas agree on its meaning: permanent, taste-based rejection. It's the only Pass option with no ambiguity.
 
 ---
 
@@ -362,75 +445,51 @@ The label implies a follow-through that doesn't exist yet. Without a behavior at
 
 | Persona | Sum | Score | Rating |
 |---------|-----|-------|--------|
-| P1 — General User | 27 | **67.5** | Good |
-| P2 — Casual Logger | 29 | **72.5** | Good |
-| P3 — Active Curator | 24 | **60.0** | Below Acceptable |
-| **Average** | — | **66.7** | **Good** |
+| P1 — General User | 29 | **72.5** | Good |
+| P2 — Casual Logger | 32 | **80.0** | Good (border of Excellent) |
+| P3 — Active Curator | 28 | **70.0** | Good |
+| **Average** | — | **74.2** | **Good** |
 
-The Curator's low score reflects a fundamental mismatch: the observation prototype is discovery-first, but the Curator's mental model is management-first. This isn't a design failure — it's a scope boundary. The prototype tests the *Watch* pattern; the Curator needs the *History* pattern too. Both patterns need to exist for this persona.
+**P2 scores highest** because the interaction is fast and requires no learning. Scan, tap, next. The single-card model maps perfectly to a 30-second reactive session.
 
-**Gap to Excellent (80+):** 13.3 points. The biggest levers:
-1. Explaining the personal score (affects confidence, integration, consistency — items 5, 6, 9)
-2. Poster discoverability (affects ease of use, cumbersomeness — items 3, 8)
-3. Distinguishing "Keep me posted" from "Add to my list" with clear follow-through (affects integration — item 5)
+**P3 scores lowest** (but still Good) because the system collects responses without visible follow-through. The Curator invests thought in each decision and wants evidence the system is using that investment. Confidence (item 9) is the drag.
+
+**P1 sits in the middle** — the interaction is clear but the personal score comparison eroded trust, and the poster preview was invisible.
+
+**Gap to Excellent (80+):** 5.8 points average. The three biggest levers:
+1. Poster discoverability (affects ease of use — item 3, confidence — item 9)
+2. Response confirmation feedback (affects confidence — item 9, integration — item 5)
+3. Personal score reasoning (affects confidence — item 9, consistency — item 6)
 
 ---
 
 ## Priority Recommendations
 
-### 1. [Critical] Explain the personal score
-**Change:** Every personal score should include reasoning: "Because you watched [X], [Y], [Z]" — matching the lightbox transparency level.
-**Why:** All 3 personas distrust the assertion without reasoning. The Curator specifically said a wrong comparison *undermines* trust. This is the same algorithm opacity problem that dragged SUS scores in Round 3.
-**Impact:** High | **Effort:** Low (reasoning already exists in the model, just needs to surface it)
+### 1. Make the poster preview discoverable
+**Change:** Add a persistent affordance — a small info icon, "Tap for details" text, or expand animation on the poster image. Do not rely on hover-only reveal.
+**Evidence:** All 3 personas missed or accidentally found the preview. The preview content (cast, backdrop, extended description) changed decision quality when found. The most valuable interaction in the prototype is invisible.
+**Impact:** High | **Effort:** Low (CSS + icon)
 
-### 2. [Critical] Distinguish "Keep me posted" from "Add to my list" with behavioral follow-through
-**Change:** "Keep me posted" → surfaces the title when relevant (new season, similar recommendation, price drop for movies). "Add to my list" → goes to a visible queue with reordering.
-**Why:** All 3 personas asked "what's the difference?" Without follow-through, the emotional distinction is meaningless. The system is collecting a signal it can't act on.
-**Impact:** High | **Effort:** Medium (needs notification/resurface logic + visible queue)
+### 2. Add response confirmation feedback
+**Change:** After tapping a response, show a brief confirmation — a checkmark animation, color flash on the button, or a subtle toast — before advancing to the next card.
+**Evidence:** All 3 personas noted the silent card transition. The Casual Logger wasn't sure the response registered. The General User had a moment of "did that work?" This is the same silent-action pattern documented across the main app.
+**Impact:** Medium | **Effort:** Low (animation + state)
 
-### 3. [Critical] Make the poster discoverable
-**Change:** Add a visible affordance — subtle "tap for details" text, cursor change on hover, or a zoom icon overlay.
-**Why:** Scotty's real test found the lightbox changes decisions but is invisible. All 3 synthetic personas either missed it or found it by accident. Same pattern as Round 1's hover-only problem.
-**Impact:** Medium | **Effort:** Low (CSS + icon overlay)
+### 3. Surface personal score reasoning
+**Change:** Change "We think you'll rate this 4/5 based on your history with X" to include the connective logic: "We think you'll rate this 4/5 — you tend to enjoy [genre] with [quality], similar to X." Or show the genre affinity scores that produced the prediction.
+**Evidence:** All 3 personas questioned the comparison when it didn't intuitively connect. P3 explicitly said a wrong comparison undermines trust in the entire system. The assertion without reasoning is worse than no assertion.
+**Impact:** High | **Effort:** Medium (reasoning already exists in watch patterns — needs to surface)
 
-### 4. [High] Solve TV logic debt — new-to-show vs. already-tracking cards
-**Change:** If the user hasn't watched the show, show series poster + series description + response language. If already tracking, show episode poster + next episode + "ready for the next one?"
-**Why:** All 3 personas said "for shows I'm already watching, 'how do you feel?' makes no sense." The current card is discovery-only.
-**Impact:** High | **Effort:** Medium (needs content type detection + two card templates)
+### 4. Reduce "Pass" options from 4 to 3
+**Change:** Merge "Not in the mood" and "Not now" into a single option — either "Not now" (simpler) or "Not in the mood" (more signal). Alternatively, keep both but make the distinction visible: "Not in the mood (energy)" vs. "Not now (skip)."
+**Evidence:** P1 and P2 treat these as interchangeable. P3 distinguishes them but acknowledges most users won't. The system may benefit from the distinction, but if 2/3 users collapse them, the signal is noise.
+**Impact:** Medium | **Effort:** Low (label change or removal)
 
-### 5. [Medium] Replace "This is the one" with less dramatic language
-**Change:** "This is the one" → **"This is it"** — less intimate, more decisive. Two personas independently compared it to dating/proposing marriage.
-**Why:** The emotional job is "strong yes" — not "declaration of commitment." The current language oversells.
-**Impact:** Low | **Effort:** Trivial
-
-### 6. [Medium] Add "Tried It" state for graceful churn
-**Change:** Route "Already seen it" → rating + "keep watching" / "not for me" flow. Add "Tried It" as a state for shows you sampled and didn't finish.
-**Why:** The Curator specifically asked for this. Scotty's real test found Fallout (2 eps, rating 2) kept resurfacing as available — "Tried It" would exclude it from recommendations.
-**Impact:** Medium | **Effort:** Medium (new state + recommendation filter)
+### 5. Design a tracking card for ongoing shows
+**Change:** If a suggested title matches a show already in the user's library with status "watching," render a tracking card instead: episode progress, air date, "mark watched" button, current rating. No emotional response language.
+**Evidence:** All 3 personas said "how do you feel?" is wrong for shows they're already watching. The observation prototype is discovery-first; ongoing shows need utility-first.
+**Impact:** High | **Effort:** Medium (needs library cross-reference + alternate card template)
 
 ---
 
-## Connection to Prior Rounds
-
-This evaluation builds on Rounds 1-3 of UX research. Key carry-forward insights:
-
-- **Silent actions** (from Rounds 2-3) remain the single largest UX debt across the entire app. The observation prototype inherits this — response selection produces no confirmation.
-- **Poster discoverability** (from Round 1) reappears in the observation prototype. Same fix pattern: make the interaction obvious, not hidden.
-- **Algorithm opacity** (from Round 3) is the personal score problem. The Curator's confidence depends on legibility — show the reasoning, not just the result.
-- **Time vs. mood** (from Round 3's urgency calibration) maps directly to "Not tonight" vs. "Not the vibe" — the system needs to infer the distinction from behavior, not ask the user to choose.
-
----
-
-## Questions for Further Research
-
-1. **What does "Keep me posted" actually trigger?** Without behavioral follow-through, the label is meaningless. What's the minimum viable action?
-2. **Should the response options be visible all the time, or appear on hover/tap?** Currently always visible — does this create decision fatigue after repeated use?
-3. **How does the revision history affect calibration accuracy?** If users frequently change their minds, does this mean the response language is wrong, or that the system is working?
-4. **Should the personal score be A/B tested without reasoning vs. with reasoning?** To quantify the confidence impact empirically.
-5. **What's the right dwell time threshold?** Currently logging dwell_time_seconds — at what point does "I looked at this" become "I considered this"?
-
----
-
-_This evaluation uses synthetic personas based on Scotty's real test data and prior research (Rounds 1-3). It should be validated with a real 10-item walkthrough and compared against these predictions._
-
-_Created: 2026-03-15_
+*Evaluation conducted March 15, 2026. Personas evaluated the prototype source code independently with no reference to prior test findings or known issues.*

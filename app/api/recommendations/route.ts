@@ -9,6 +9,7 @@ import {
   clearRecommendations,
   addRecommendation,
   getAllShows,
+  getWatchPatterns,
 } from "@/lib/db";
 import { generateRecommendations } from "@/lib/ai";
 import { getShowDetails, getPosterUrl, searchMulti } from "@/lib/tmdb";
@@ -43,10 +44,18 @@ export async function POST() {
       });
     }
 
+    const genreAffinities = getWatchPatterns().map((p) => ({
+      genre: p.genre,
+      count: p.count,
+      avgUserRating: p.avgUserRating,
+      completionRate: p.completionRate,
+    }));
+
     const aiRecommendations = await generateRecommendations(
       watchingShows,
       completedShows,
-      10
+      10,
+      genreAffinities
     );
 
     clearRecommendations();

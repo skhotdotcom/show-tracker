@@ -12,7 +12,7 @@ You are a UX researcher evaluating the Show Tracker observation prototype. Run a
 
 Read these files in order:
 1. `app/test/observation/page.tsx` — the prototype source code (this is the primary object of evaluation)
-2. `ai-prototype-brief.md` — full prototype brief (context on what this prototype is for)
+2. `docs/ai-prototype-brief.md` — full prototype brief (context on what this prototype is for)
 3. `docs/ux-research.md` — existing personas and prior research (Rounds 1-3) for persona definitions only
 
 **Do NOT read `docs/prototype-test-insights.md`** — this contains real test findings. Reading it would bias the evaluation. The personas should discover issues independently.

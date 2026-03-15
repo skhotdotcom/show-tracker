@@ -18,6 +18,7 @@ import {
   deleteShow,
 } from "@/lib/db";
 import { getShowDetails, getPosterUrl, getBackdropUrl, getSeasonEpisodeCount } from "@/lib/tmdb";
+import { updateShowMetadata } from "@/lib/db";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -47,6 +48,15 @@ export async function POST(request: NextRequest) {
       overview,
       release_date,
     });
+
+    // Enrich with genres + TMDB rating in the background (don't block the response)
+    if (show && tmdb_id) {
+      getShowDetails(tmdb_id, type).then((details) => {
+        const genres = details.genres?.map((g: { id: number; name: string }) => g.name) ?? [];
+        const tmdbRating = details.vote_average ?? null;
+        updateShowMetadata(show.id, genres.length ? JSON.stringify(genres) : null, tmdbRating || null);
+      }).catch(() => {/* non-fatal */});
+    }
 
     return NextResponse.json(show);
   } catch (error) {

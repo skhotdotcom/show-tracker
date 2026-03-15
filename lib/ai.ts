@@ -129,29 +129,44 @@ If no shows are mentioned, return: {"shows": []}`;
   }
 }
 
+interface GenreAffinityContext {
+  genre: string;
+  count: number;
+  avgUserRating: number | null;
+  completionRate: number | null;
+}
+
 // Generate personalised show/movie recommendations based on the user's watch history.
 // Returns titles that can be searched in TMDB to enrich with metadata.
 export async function generateRecommendations(
   watchingShows: string[],
   completedShows: string[],
-  count: number = 10
+  count: number = 10,
+  genreAffinities: GenreAffinityContext[] = []
 ): Promise<Array<{ title: string; type: 'tv' | 'movie'; reason: string }>> {
+  const genreContext = genreAffinities.length > 0
+    ? `\nGenre watch patterns (most-watched first):
+${genreAffinities.slice(0, 8).map((g) =>
+  `  - ${g.genre}: ${g.count} titles watched${g.avgUserRating != null ? `, avg rating ${g.avgUserRating.toFixed(1)}/5` : ''}${g.completionRate != null ? `, ${Math.round(g.completionRate * 100)}% finish rate` : ''}`
+).join('\n')}`
+    : '';
+
   const prompt = `Based on the user's viewing history, recommend ${count} TV shows or movies they might enjoy.
 
 Currently watching: ${watchingShows.join(', ') || 'None'}
-Completed/enjoyed: ${completedShows.join(', ') || 'None'}
+Completed/enjoyed: ${completedShows.join(', ') || 'None'}${genreContext}
 
 For each recommendation, provide:
 1. The exact title (accurate for searching)
 2. Type: "tv" or "movie"
-3. A brief reason why they'd like it based on their history
+3. A brief reason why they'd like it based on their history and genre patterns
 
 Respond with ONLY a JSON array:
 [
   {"title": "Show Name", "type": "tv", "reason": "Because you enjoyed X..."}
 ]
 
-Do not include shows they've already watched or are currently watching. Focus on accurate, searchable titles.`;
+Do not include shows they've already watched or are currently watching. Focus on accurate, searchable titles. Lean toward genres they watch and finish most.`;
 
   try {
     const response = await fetch(`${LM_STUDIO_URL}/v1/chat/completions`, {

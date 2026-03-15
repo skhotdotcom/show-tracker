@@ -70,6 +70,8 @@ export function useShows() {
       notes: null,
       next_season: 1,
       next_episode: 1,
+      genres: null,
+      tmdb_rating: null,
       created_at: now,
       updated_at: now,
     };

@@ -103,6 +103,19 @@ function initializeDatabase(database: Database.Database) {
 
     CREATE INDEX IF NOT EXISTS idx_suggestion_log_tmdb ON suggestion_log(tmdb_id);
     CREATE INDEX IF NOT EXISTS idx_suggestion_log_response ON suggestion_log(response);
+
+    CREATE TABLE IF NOT EXISTS language_capture (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      content_type TEXT CHECK(content_type IN ('tv', 'movie')) NOT NULL,
+      title TEXT NOT NULL,
+      tmdb_id INTEGER NOT NULL,
+      season_number INTEGER,
+      episode_number INTEGER,
+      raw_response TEXT NOT NULL,
+      persona TEXT,
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+      dwell_time_seconds REAL
+    );
   `);
 
   // Migrations — ALTER TABLE is a no-op (caught) if the column already exists.
@@ -386,6 +399,52 @@ export function getStats() {
     FROM shows
   `).get();
   return stats;
+}
+
+// --- Language Capture (open-text response test) ---
+
+export interface LanguageCapture {
+  id: number;
+  content_type: 'tv' | 'movie';
+  title: string;
+  tmdb_id: number;
+  season_number: number | null;
+  episode_number: number | null;
+  raw_response: string;
+  persona: string | null;
+  timestamp: string;
+  dwell_time_seconds: number | null;
+}
+
+export function logLanguageCapture(input: {
+  content_type: 'tv' | 'movie';
+  title: string;
+  tmdb_id: number;
+  season_number?: number | null;
+  episode_number?: number | null;
+  raw_response: string;
+  persona?: string | null;
+  dwell_time_seconds?: number | null;
+}): LanguageCapture {
+  const stmt = getDb().prepare(`
+    INSERT INTO language_capture (content_type, title, tmdb_id, season_number, episode_number, raw_response, persona, dwell_time_seconds)
+    VALUES (@content_type, @title, @tmdb_id, @season_number, @episode_number, @raw_response, @persona, @dwell_time_seconds)
+  `);
+  const result = stmt.run({
+    content_type: input.content_type,
+    title: input.title,
+    tmdb_id: input.tmdb_id,
+    season_number: input.season_number ?? null,
+    episode_number: input.episode_number ?? null,
+    raw_response: input.raw_response,
+    persona: input.persona ?? null,
+    dwell_time_seconds: input.dwell_time_seconds ?? null,
+  });
+  return getDb().prepare('SELECT * FROM language_capture WHERE id = ?').get(result.lastInsertRowid) as LanguageCapture;
+}
+
+export function getLanguageCaptures(limit = 200): LanguageCapture[] {
+  return getDb().prepare('SELECT * FROM language_capture ORDER BY timestamp DESC LIMIT ?').all(limit) as LanguageCapture[];
 }
 
 // --- Observation / Suggestion Log ---

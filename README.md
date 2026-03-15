@@ -1,12 +1,67 @@
 # Show Tracker
 
-A local-first app for tracking what you watch. Add TV shows and movies to your queue, track your episode progress, get notified when new episodes drop, and get AI-powered recommendations — all from a clean, browsable interface.
+A local-first app for tracking what you watch — and a living case study in AI-assisted prototyping. Built with Next.js, SQLite, and TMDB. AI features powered by a local LLM via LM Studio.
 
 ---
 
-## Docs
+## Case Study: The Prototype as a Learning System
 
-- [UX Research](docs/ux-research.md) — Personas, cognitive walkthroughs, SUS scores, and 4 L's across two evaluation rounds (SUS 62.5 → 75.0)
+This project started as a personal show tracker and evolved into something more: a research instrument for understanding how people choose what to watch.
+
+The core insight came from observation, not surveys. Watching someone do 20 minutes of mental inventory — "I think I'm caught up on Mobland, did a new Pitt drop?" — revealed that **ratings don't capture energy-based selection**. The algorithm knows air dates and ratings. It doesn't know you're eating dinner, you're tired, and RPDR is a no-brainer in that context.
+
+The prototype pipeline:
+
+1. **Observe** — Live conversation analysis, not surveys. Extracted 7 micro-jobs (JTBD) from how someone actually talks about their shows.
+2. **Build** — Each micro-job became a testable interaction pattern. "Tonight's Pick" solves the dinner decision. "Mark Through" solves the binge logger. "On Radar" solves uncommitted interest.
+3. **Test** — Cognitive walkthroughs with synthetic personas (SUS scoring: 62.5 → 75.0 across 3 rounds). Real user walkthrough with 10 content options.
+4. **Learn** — The observation prototype doesn't just test interaction patterns — it *is* the pattern learning system. Every user response is a calibration signal that makes the next suggestion better.
+
+> "The prototype isn't testing the patterns. The prototype IS the pattern learning system." — [Interaction Pattern Taxonomy](docs/interaction-pattern-taxonomy.md)
+
+The feedback loop: **observe → learn → calibrate → anticipate**. The same macro pattern that powered Shadow Health's conversation AI (2016) and Holmusk's clinical workflow — applied to content discovery.
+
+---
+
+## Design Timeline
+
+| Date | What Happened | Artifact |
+|------|---------------|----------|
+| **Round 1** | Initial UX evaluation — 3 personas, cognitive walkthroughs, SUS baseline (avg 62.5) | [UX Research](docs/ux-research.md) |
+| **Round 2** | Iteration on feedback — SUS improved to 72.5 avg. Identified interaction backlog. | [UX Research](docs/ux-research.md) |
+| **Round 3** | Session + Timeline views evaluated. SUS reached 75.0. | [UX Research](docs/ux-research.md) |
+| **JTBD Analysis** | Extracted 7 micro-jobs from live observation. Defined energy-aware recommendation model. | [AI Prototype Brief](docs/ai-prototype-brief.md) |
+| **Phase 0 Build** | Observation prototype — single-card suggestion loop with emotional response options and behavioral logging. | [Build Prompt](docs/prompts/phase-0-observation-layer.md) |
+| **Real User Test** | Solo walkthrough of 10 suggestions. Found: response language doesn't match mental model, poster lightbox undiscoverable, TV episode logic broken. | [Test Insights](docs/prototype-test-insights.md) |
+| **Synthetic Eval** | 3-persona evaluation of observation prototype (SUS avg 74.2). Cross-persona language audit. | [Evaluation](docs/observation-prototype-evaluation.md) |
+| **Language Test** | Built open-text variant. 30 synthetic responses clustered into 6 intent categories. Recommended reducing labels from 8 to 6. | [Language Test](docs/observation-language-test.md) |
+| **Taxonomy** | Defined the interaction pattern / component / experience distinction. Mapped behavioral signal stack. Connected to course + article writing. | [Interaction Pattern Taxonomy](docs/interaction-pattern-taxonomy.md) |
+
+---
+
+## Documentation Strategy
+
+All documentation lives in `docs/`. No loose `.md` files in the repo root (except this README).
+
+```
+docs/
+  ai-prototype-brief.md          # JTBD analysis, energy model, prototype specs (P1-P6)
+  interaction-pattern-taxonomy.md # Thinking notes — taxonomy, behavioral signals, macro pattern
+  ux-research.md                  # Rounds 1-3 persona evaluations, SUS scores, 4Ls
+  observation-prototype-evaluation.md  # Synthetic persona eval of observation prototype
+  observation-language-test.md    # Open-text language capture analysis + label recommendations
+  prototype-test-insights.md      # Real user test notes — 8 findings from first walkthrough
+  prompts/
+    phase-0-observation-layer.md           # Build prompt for observation prototype
+    observation-evaluation-claude-code.md  # Evaluation prompt (unbiased persona test)
+    observation-prototype-evaluation.md    # Alternate evaluation prompt
+```
+
+**What goes where:**
+- **Research findings** (evaluations, test notes, language analysis) → `docs/`
+- **Design artifacts** (briefs, taxonomies) → `docs/`
+- **Prompts** (reusable Claude Code / LLM prompts) → `docs/prompts/`
+- **Code** (prototypes, APIs, components) → `app/`, `lib/`, `components/`
 
 ---
 
@@ -19,6 +74,7 @@ A local-first app for tracking what you watch. Add TV shows and movies to your q
 - **Detail Dialog** — Full action hub for any show: mark episodes watched, edit S/E position, change status (start/complete/drop), rate, take notes, and delete.
 - **AI Recommendations** — Powered by a local LLM (LM Studio) based on what you've watched and rated.
 - **AI Chat** — Ask questions about your watchlist, get suggestions, or discuss shows.
+- **Watch Patterns** — Genre affinity stats with clickable filter chips. Shows your completion rates, average ratings, and genre distribution.
 
 ---
 
@@ -43,12 +99,18 @@ Prescriptive session planner. Answers "what should I watch tonight?" using a pri
 
 1. Shows with an episode airing within 2 days (catch up while it's relevant)
 2. Shows watched in the last 3 days (keep the momentum)
-3. Shows idle for 5–14 days (gentle nudge back)
+3. Shows idle for 5-14 days (gentle nudge back)
 4. Queued shows ready to start
 
 Suggestions appear as a ranked numbered list with context-aware reason text. The Available grid below highlights which shows are in tonight's suggestion and dims the rest.
 
 Best for: short-session decisions, low-friction next-action flow.
+
+### Observation Prototype (`/test/observation`)
+Experimental. Single-card suggestion loop — shows one TMDB title at a time and asks "How do you feel about this one?" Responses are emotional intent labels. Every interaction is logged with behavioral metadata (dwell time, time of day, day of week) for pattern analysis.
+
+### Language Capture (`/test/observation/language`)
+Experimental. Open-text variant of the observation prototype. Instead of fixed labels, users type whatever comes to mind. Used for UX writing research — clustering natural language into intent categories.
 
 ---
 
@@ -56,7 +118,7 @@ Best for: short-session decisions, low-friction next-action flow.
 
 | Layer | Technology |
 |---|---|
-| Framework | Next.js 14 (App Router) |
+| Framework | Next.js 15 (App Router) |
 | Language | TypeScript |
 | Database | SQLite via `better-sqlite3` |
 | UI | shadcn/ui + Tailwind CSS |
@@ -109,17 +171,23 @@ Open [http://localhost:3000](http://localhost:3000).
 app/
   page.tsx                  # Classic view — carousels by status
   views/
-    temporal/
-      page.tsx              # Timeline view — urgency-ranked Now / This Week / Activity
-    session/
-      page.tsx              # Session view — prescriptive "watch tonight" planner
+    temporal/page.tsx       # Timeline view — urgency-ranked Now / This Week / Activity
+    session/page.tsx        # Session view — prescriptive "watch tonight" planner
+  test/
+    observation/page.tsx    # Observation prototype — emotional response suggestion loop
+    observation/language/page.tsx  # Language capture variant — open-text responses
   api/
     shows/                  # CRUD for shows, status changes, ratings
+    shows/backfill/         # Batch genre/rating enrichment for existing shows
     search/                 # TMDB search proxy (server-side)
     upcoming/               # Next episode lookup + air date checking
     recommendations/        # AI recommendation generation
     chat/                   # AI chat endpoint
     history/                # Watched history
+    suggestions/            # TMDB trending content for observation prototype
+    observations/           # Observation logging (structured responses)
+    observations/language/  # Language capture logging (open-text responses)
+    watch-patterns/         # Genre affinity stats
 
 hooks/
   useShows.ts               # Show list state, status/rating mutations
@@ -137,66 +205,12 @@ components/
   add-show-dialog.tsx       # Search and add shows via TMDB
   coming-soon.tsx           # Upcoming episode rows (click-to-detail)
   chat-panel.tsx            # Floating AI chat drawer
+  watch-patterns.tsx        # Genre affinity stats + filter chips
 
 lib/
   db.ts                     # SQLite queries and schema migrations
   tmdb.ts                   # TMDB API client (server-side only)
   ai.ts                     # LM Studio AI client
+
+docs/                       # All research, design, and prompt documentation
 ```
-
----
-
-## Backlog
-
-### 🔲 Pending
-
-- [ ] **Silent actions** — No feedback after Mark Watched, status changes, or ratings. Toast notifications or subtle confirmation cues would close the loop.
-- [ ] **Queue ordering** — No way to reorder the Watch Next queue. Drag-to-reorder or a priority field would let users sequence their backlog.
-- [ ] **Mid-series add flow** — Adding a show already in progress requires three steps (add → open → set episode). A "currently on episode…" field in the add dialog would reduce this to one.
-- [ ] **Binge logger shortcut** — No fast path for logging multiple episodes in one session. A "mark through S01E04" bulk action would serve binge-watchers.
-- [ ] **Rating prompt on complete** — Completing a show doesn't prompt for a rating. A completion dialog with a star prompt would capture ratings while the experience is fresh.
-- [ ] **Sort and filter** — No way to sort or filter the library by genre, network, rating, or date added.
-- [ ] **Cross-section search** — No global search across the full library.
-
-### ✅ Completed
-
-- [x] Add shows and movies via TMDB search
-- [x] Status management: queued → watching → completed / dropped
-- [x] History view with completed and dropped shows
-- [x] AI recommendations based on watch history
-- [x] AI chat panel (floating drawer)
-- [x] Refactor `page.tsx` god component into custom hooks (`useShows`, `useUpcoming`, `useRecommendations`, `useChat`)
-- [x] Fix TMDB API key leak — search now routes through `/api/search` instead of calling TMDB directly from the client
-- [x] Episode-level tracking — store and display `next_season` / `next_episode` per show
-- [x] Fetch episode details from TMDB (title, air date, still image)
-- [x] 16:9 landscape cards using episode stills and show backdrops
-- [x] Episode badge (`S01E01`) always visible on watching cards
-- [x] Episode title displayed below show name on cards
-- [x] "Continue Watching" vs "Coming Soon" split by episode air date
-- [x] Mark episode as watched — auto-advances to next episode (handles season rollovers)
-- [x] Inline episode position editor on show cards
-- [x] Dedicated `RecommendationCard` component with "Add to Queue" button
-- [x] Refresh upcoming data after status changes (moving from Watch Next to Continue Watching now shows episode details immediately)
-- [x] Star ratings in History view (interactive, wired to PATCH API)
-- [x] **Carousel View All Button** — toggle between carousel and full responsive grid per row
-- [x] **Per-feature data refresh** — every mutation refreshes only the hooks it affects
-- [x] **`.env.example`** — all required environment variables documented for new contributors
-- [x] **`.gitignore` update** — `data/` directory ignored to prevent committing the local database
-- [x] **Hide "Coming Soon" when empty** — section returns null when there are no upcoming episodes
-- [x] **Mobile navigation** — fixed bottom nav bar for mobile (Home + History tabs)
-- [x] **Episode tracking UI** — season/episode counter with inline editor on watching cards
-- [x] **Show type badges** — `TV` / `Movie` label shown in status badge on cards
-- [x] **Optimistic UI updates** — all mutations in `useShows` apply optimistic local state immediately and revert on server error
-- [x] **Show detail modal** — click a show title on hover to open a detail view with overview, notes, episode progress, date added, and ratings
-- [x] **Notes field** — textarea in the show detail modal, saved via PATCH API
-- [x] **Re-queue dropped shows** — History list now shows a re-queue button for dropped shows
-- [x] **Ratings on watching cards** — interactive star rating in the show card hover overlay
-- [x] **Card click → detail dialog** — the card body is now the click target; no hover required to reach any action
-- [x] **Detail dialog as full action hub** — Mark Watched, Set Position, Start Watching, Mark Complete, Drop, and Delete all live in the dialog; hover overlay is a convenience shortcut, not the only path
-- [x] **Detail dialog state sync** — `detailShowId` stores an ID, not a snapshot; `detailShow` is derived live from `useShows` state so optimistic updates inside the dialog are always in sync
-- [x] **Carousel scroll preservation** — scroll position saved to a ref on every scroll event and restored after state-driven re-renders; marking a show watched no longer resets the carousel to position 0
-- [x] **Coming Soon click-to-detail** — clicking a Coming Soon row opens the show detail dialog
-- [x] **History click-to-detail** — clicking anywhere on a history row opens the show detail dialog; action buttons use `stopPropagation` to avoid conflicts
-- [x] **Timeline view** — new `/views/temporal` page with urgency-ranked Now section, This Week airing/ready section, and Activity journal; Mark Watched button always visible (no hover dependency)
-- [x] **Session view** — new `/views/session` page with prescriptive "Watch Tonight" ranked suggestions, Available poster grid, and compact history; suggestion algorithm weighs recency, upcoming air dates, and queue status
-- [x] **View switcher** — Classic / Timeline / Session navigation pills in the header; active state driven by `usePathname()`

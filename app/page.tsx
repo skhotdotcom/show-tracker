@@ -17,12 +17,14 @@ import { useUpcoming } from "@/hooks/useUpcoming";
 import type { NextEpisodeInfo } from "@/hooks/useUpcoming";
 import { Plus, RefreshCw, Tv, Bot, Home as HomeIcon, History } from "lucide-react";
 import { ViewSwitcher } from "@/components/view-switcher";
+import { WatchPatterns } from "@/components/watch-patterns";
 
 export default function Home() {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"home" | "history">("home");
   const [detailShowId, setDetailShowId] = useState<number | null>(null);
+  const [activeGenre, setActiveGenre] = useState<string | null>(null);
 
   const shows = useShows();
   const upcoming = useUpcoming();
@@ -55,18 +57,27 @@ export default function Home() {
 
   const detailNextEpisode = detailShowId != null ? (episodeInfoMap[detailShowId] ?? null) : null;
 
+  // Genre filter — null means "show all"
+  const filterByGenre = (list: typeof shows.shows) => {
+    if (!activeGenre) return list;
+    return list.filter((s) => {
+      if (!s.genres) return false;
+      try { return (JSON.parse(s.genres) as string[]).includes(activeGenre); } catch { return false; }
+    });
+  };
+
   // TV shows whose next episode hasn't aired yet go to Coming Soon, not Continue Watching
   const comingSoonShowIds = new Set(upcoming.comingSoon.map((i) => i.show.id));
 
-  const watchingTvAvailable = shows.shows.filter(
+  const watchingTvAvailable = filterByGenre(shows.shows.filter(
     (s) => s.status === "watching" && s.type === "tv" && !comingSoonShowIds.has(s.id)
-  );
-  const watchingMovies = shows.shows.filter(
+  ));
+  const watchingMovies = filterByGenre(shows.shows.filter(
     (s) => s.status === "watching" && s.type === "movie"
-  );
+  ));
   const continueWatching = [...watchingTvAvailable, ...watchingMovies];
 
-  const queuedShows = shows.shows.filter((s) => s.status === "queued");
+  const queuedShows = filterByGenre(shows.shows.filter((s) => s.status === "queued"));
   const historyShows = shows.shows.filter(
     (s) => s.status === "completed" || s.status === "dropped"
   );
@@ -131,6 +142,12 @@ export default function Home() {
       <main className="py-6">
         {activeTab === "home" ? (
           <div className="space-y-6 px-4 md:px-12">
+            <WatchPatterns
+              activeGenre={activeGenre}
+              onGenreClick={setActiveGenre}
+              onBackfillComplete={shows.refresh}
+            />
+
             {continueWatching.length > 0 && (
               <CarouselRow
                 title="Continue Watching"

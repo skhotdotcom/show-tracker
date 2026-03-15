@@ -125,12 +125,20 @@ export function ShowCard({
           )}
         </div>
 
-        {show.rating && (
-          <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/70 rounded px-1.5 py-0.5">
-            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-            <span className="text-xs font-medium">{show.rating}</span>
-          </div>
-        )}
+        <div className="absolute top-2 right-2 flex flex-col items-end gap-1">
+          {show.rating && (
+            <div className="flex items-center gap-1 bg-black/70 rounded px-1.5 py-0.5">
+              <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+              <span className="text-xs font-medium">{show.rating}</span>
+            </div>
+          )}
+          {show.tmdb_rating != null && (
+            <div className="flex items-center gap-1 bg-black/50 rounded px-1.5 py-0.5" title="TMDB rating">
+              <Star className="w-3 h-3 fill-blue-400 text-blue-400" />
+              <span className="text-xs text-white/70">{show.tmdb_rating.toFixed(1)}</span>
+            </div>
+          )}
+        </div>
 
         {/* Hover overlay — quick actions, all stopPropagation to preserve card click */}
         <div
@@ -138,7 +146,26 @@ export function ShowCard({
             isHovered ? "opacity-100" : "opacity-0"
           }`}
         >
-          <p className="text-sm font-medium line-clamp-1 mb-2">{show.title}</p>
+          <p className="text-sm font-medium line-clamp-1 mb-1">{show.title}</p>
+
+          {/* Genre chips */}
+          {show.genres && (() => {
+            try {
+              const genres: string[] = JSON.parse(show.genres);
+              return genres.length > 0 ? (
+                <div className="flex flex-wrap gap-1 mb-1.5">
+                  {genres.slice(0, 3).map((g) => (
+                    <span
+                      key={g}
+                      className="text-[10px] bg-white/15 rounded-full px-1.5 py-0.5 text-white/80"
+                    >
+                      {g}
+                    </span>
+                  ))}
+                </div>
+              ) : null;
+            } catch { return null; }
+          })()}
 
           {/* Star rating */}
           {onRate && (
