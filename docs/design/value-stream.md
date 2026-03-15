@@ -2,6 +2,8 @@
 
 _The flow of value from the customer's perspective. Each step delivers value on its own, and value compounds across the stream._
 
+_Macro-level thinking. The specific scaling paths — B2B2C, partner integration, unknown future uses — will emerge as the module matures. This framework is designed to accommodate them._
+
 ---
 
 ## The Question
@@ -90,6 +92,16 @@ Not "what features do we need?" but "where does value accrue for the customer at
 | "I thought it was efficient..." | Fast decisions, no grid paralysis | One card, immediate response |
 
 **92 means the customer feels the value stream working — not just features existing.**
+
+---
+
+## B2B2C: Two Streams, One Framework
+
+This value stream is the **consumer experience** — what the viewer feels. A companion **business outcomes** document will map each consumer moment to measurable business metrics (engagement, retention, subscription growth, referral leads).
+
+Two separate documents, scaling together. The consumer stream drives component design. The business outcomes doc drives partner positioning. The business outcomes are the *measurement* of the consumer stream working.
+
+Additional scaling paths beyond B2B2C are expected to emerge as the module matures. The framework is designed to accommodate them without restructuring.
 
 ---
 
