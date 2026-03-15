@@ -4,7 +4,35 @@ _Target: SUS 92. Current: 74.2. Gap: 17.8 points across 3 personas._
 
 ---
 
-## Phase 0: Response Language (Foundation)
+## Working Model: Cycles, Not Phases
+
+**For internal work:** Think in cycles of discovery and delivery. The prototype IS the pattern learning system. Each cycle builds, tests, learns, and feeds the next cycle. The value stream is a loop, not a line.
+
+**For external communication:** Phases are the linear translation of cyclical work. Partners, engineering teams, and stakeholders may need to see a dependency-ordered roadmap. This doc serves both purposes — but the work itself cycles.
+
+```
+Discovery → Delivery → Discovery → Delivery → ...
+   ↓            ↓           ↓           ↓
+ Learn        Build      Validate     Refine
+```
+
+Each cycle:
+1. **Discover** — Run unbiased evaluation. Test language. Observe behavior.
+2. **Deliver** — Build what the cycle revealed. Ship a component.
+3. **Validate** — Re-run evaluation. Check SUS. Update value stream doc.
+4. **Learn** — What surprised us? What's the next opportunity?
+
+---
+
+---
+
+## Current Cycle: Response Language + Trust
+
+The first cycle focuses on what the customer says (response language) and whether the system confirms it heard them (trust). These aren't sequential steps — they're one learning loop. Build both, test both, learn from both.
+
+---
+
+## Response Language (Cycle 1 — Discovery + Delivery)
 
 Everything else depends on this. The prototype still uses 8 labels. Reduce to 5 + "Already seen it" based on validated natural language clustering.
 
@@ -21,7 +49,7 @@ Everything else depends on this. The prototype still uses 8 labels. Reduce to 5 
 
 ---
 
-## Phase 1: Visible Feedback (Trust Loop)
+## Visible Feedback (Cycle 1 — Delivery + Validation)
 
 The customer needs to see the system respond. Right now actions are silent. Each response should feel heard.
 
@@ -35,66 +63,48 @@ The customer needs to see the system respond. Right now actions are silent. Each
 
 ---
 
-## Phase 2: "I'm In" Exit Behavior (Session Closure)
+## "I'm In" Exit Behavior (Cycle 2 — Discovery + Delivery)
 
 "I'm in" isn't just a strong yes — it's an exit signal. The customer commits, the session ends, the title transitions to tracking.
 
 | Task | Status | Depends On |
 |------|--------|------------|
-| Define "I'm in" as session-ending action | Not started | Phase 0 |
+| Define "I'm in" as session-ending action | Not started | Response language |
 | Transition title from discovery to tracking state | Not started | "I'm in" definition |
 | Post-exit screen: "You're watching X. Here's when the next episode drops." | Not started | Transition |
-| Tracking mode: different card type for in-progress shows | Not started | Phase 3 |
-
-**Why third:** This is the first major interaction pattern that goes beyond "respond and move on." It's the commitment moment — and it connects discovery to tracking.
 
 ---
 
-## Phase 3: TV Logic (Card Types)
+## TV Logic + Poster Discoverability (Cycle 3 — Discovery + Delivery)
 
-The prototype treats everything the same. But a new-to-show card and a mid-season tracking card are different jobs.
+Two opportunities, one cycle:
+- **TV logic:** New-to-show cards and tracking cards are different jobs. Separate them.
+- **Poster discoverability:** All 3 personas missed the lightbox. Make context visible.
 
 | Task | Status | Depends On |
 |------|--------|------------|
-| New-to-show card: response language (the 5 labels) | Not started | Phase 0 |
-| Already-tracking card: next episode, mark watched, no response language | Not started | Phase 2 |
-| "I'm in" transition: new-to-show → already-tracking | Not started | Phase 2 |
-
-**Why fourth:** This solves the "cumbersome" SUS item. Tracking shows shouldn't feel like discovering shows. Separate jobs, separate cards.
+| New-to-show card: response language (5 labels) | Not started | Response language |
+| Already-tracking card: next episode, mark watched | Not started | "I'm in" exit |
+| Add persistent affordance to poster (info icon / tap for details) | Not started | — |
+| Decision quality measurement (did details change response?) | Not started | Affordance |
 
 ---
 
-## Phase 4: Poster Discoverability (Decision Quality)
+## Rating Flow + "Because You Watched" (Cycle 4 — Discovery + Delivery)
 
-All 3 personas missed the poster click. Lightbox reveals cast, tagline, description — but only if found.
-
-| Task | Status | Depends On |
-|------|--------|------------|
-| Add persistent affordance to poster (tap for details / info icon) | Not started | Phase 0 |
-| Lightbox: cast, tagline, extended description | Already built | Affordance |
-| Decision quality measurement (did details change response?) | Not started | Lightbox |
-
-**Why fifth:** Direct impact on "easy to use" and "confident using it." The system earns trust when it gives enough context to make a decision without leaving the flow.
-
----
-
-## Phase 5: Rating Flow (Behavioral Language)
-
-Stars are wrong. "I couldn't stop watching" / "It was fine" / "I almost turned it off" — behavioral language captures the experience.
+Stars are wrong. Behavioral language captures the experience. "Because you watched X" builds recommendation confidence.
 
 | Task | Status | Depends On |
 |------|--------|------------|
-| Design post-watch response options (behavioral language) | Not started | Phase 0 |
+| Design post-watch response options (behavioral language) | Not started | — |
 | Map responses to personal score reasoning | Not started | Response options |
 | "Because you watched X, Y, Z" recommendation justification | Not started | Score reasoning |
 
-**Why sixth:** This is the reflection moment in the value stream. It feeds back into calibration and enables the "Because you watched..." reasoning that builds confidence.
-
 ---
 
-## Phase 6: Pre-Release / Pending Pattern (M7)
+## Pre-Release / Pending Pattern (Cycle 5 — Discovery + Delivery)
 
-"Tell me when X is available" — new interaction pattern for content not yet released.
+"Tell me when X is available" — new interaction pattern (M7) for content not yet released. Independent of the core loop.
 
 | Task | Status | Depends On |
 |------|--------|------------|
@@ -102,31 +112,11 @@ Stars are wrong. "I couldn't stop watching" / "It was fine" / "I almost turned i
 | Pending card type (different from discovery/tracking) | Not started | Notify Me |
 | Release date reminder system | Not started | Pending state |
 
-**Why last:** This is a new micro-job (M7) that doesn't depend on the existing flow. It's additive — the core loop works without it. But it completes the observation layer IP.
-
----
-
-## Dependency Map
-
-```
-Phase 0 (Response Language)
-  ↓
-Phase 1 (Visible Feedback)
-  ↓
-Phase 2 ("I'm In" Exit)
-  ↓
-Phase 3 (TV Logic)
-  
-Phase 0 → Phase 4 (Poster Discoverability)
-Phase 0 → Phase 5 (Rating Flow)
-Phase 6 (Pre-Release) — independent
-```
-
 ---
 
 ## Evaluation Gates
 
-After each phase:
+After each cycle:
 1. **Re-run unbiased evaluation** with the 3 personas
 2. **Check SUS scores** — are we moving toward 92?
 3. **Update value stream doc** — does the customer feel the new value?
