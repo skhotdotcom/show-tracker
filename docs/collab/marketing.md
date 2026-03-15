@@ -55,6 +55,6 @@ Three layers of proprietary IP — observation, taxonomy, collaboration — desi
 
 ---
 
-## Additional Tooling
+## Additional Context
 
-The marketing skill plugin (`claude-knowledge-work/marketing-plugin/`) has modules for brand voice, campaign planning, content creation, competitive analysis, and performance analytics. Use this doc as your project context, and pull from the plugin when you need structured templates or frameworks.
+For brand voice guidelines, campaign planning, content creation frameworks, competitive analysis, and performance analytics, see the marketing toolkit in `claude-knowledge-work/marketing-plugin/`.

@@ -54,9 +54,9 @@ Living context docs where each cross-functional audience has a self-contained fi
 
 ---
 
-## Additional Tooling
+## Additional Context
 
-The sales skill plugin (`claude-knowledge-work/sales-plugin/`) has modules for account research, call prep, competitive intelligence, asset creation, and outreach. Use this doc as your project context, and pull from the plugin when you need structured sales workflows.
+For account research, call preparation, competitive intelligence, asset creation, and outreach frameworks, see the sales toolkit in `claude-knowledge-work/sales-plugin/`.
 
 ---
 
