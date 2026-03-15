@@ -6,7 +6,17 @@ _Living document. Updated as research rounds complete._
 
 ## What This Is
 
-Show Tracker is a local-first app for tracking what you watch, built with Next.js, SQLite, and TMDB. The observation prototype (`/test/observation`) is a behavioral calibration system — it presents one title at a time, captures emotional intent responses, and logs behavioral metadata (dwell time, time of day, revision patterns). Over time, it learns how a specific person chooses what to watch — not from ratings, but from energy, context, and mood.
+Three layers of proprietary IP for AI-assisted content discovery — observation, taxonomy, collaboration. Built as a research prototype with Next.js, SQLite, and TMDB. The observation layer (`/test/observation`) is a behavioral calibration system: one title at a time, emotional intent responses, behavioral metadata. Designed to be extracted and integrated into streaming platforms and AI-powered customer experiences.
+
+---
+
+## The Three Layers
+
+| Layer | Strategic Value | Target Use Case |
+|-------|----------------|-----------------|
+| **Observation Layer** | Behavioral calibration engine — learns from individual response patterns, not aggregate data | Streaming platforms, recommendation engines, AI-powered customer experiences |
+| **Interaction Pattern Taxonomy** | Reusable design methodology — pattern/component/experience distinction, behavioral signal stack, emotional job framework | Design teams, AI prototyping workflows, product organizations |
+| **Collaboration Framework** | Cross-functional context docs designed for AI agents — each audience has a self-contained file their AI reads independently | Product teams, agencies, AI-assisted workflows |
 
 ---
 

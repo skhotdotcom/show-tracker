@@ -6,7 +6,7 @@ _Living document. Updated as architecture decisions are made._
 
 ## What This Is
 
-Show Tracker is a local-first app for tracking what you watch, built with Next.js 15 (App Router), SQLite via better-sqlite3, and TMDB API. The observation prototype (`/test/observation`) captures emotional intent responses to content suggestions and logs behavioral metadata for pattern analysis.
+Proprietary research prototype containing three layers of extractable IP: observation layer (behavioral calibration), interaction pattern taxonomy (design methodology), and collaboration framework (cross-functional context for AI agents). Built with Next.js 15 (App Router), SQLite via better-sqlite3, and TMDB API. Designed to be extracted as standalone modules for integration into commercial platforms.
 
 ---
 
