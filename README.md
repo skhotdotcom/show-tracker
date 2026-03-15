@@ -59,7 +59,7 @@ The feedback loop: **observe → learn → calibrate → anticipate**. The same 
 
 ## Documentation Strategy
 
-All documentation lives in `docs/`. No loose `.md` files in the repo root (except this README). Three folders, organized by purpose.
+All documentation lives in `docs/`. No loose `.md` files in the repo root (except this README). Four folders, organized by purpose.
 
 ```
 docs/
@@ -71,7 +71,12 @@ docs/
   design/                                # Strategy, briefs, frameworks
     brief.md                             # JTBD analysis, energy model, prototype specs (P1-P6)
     taxonomy.md                          # Interaction pattern / component / experience distinction
-    handoff.md                           # Cross-functional considerations (product, eng, design, marketing, sales)
+  collab/                                # Living context docs — one per collaborator audience
+    product.md                           # Leadership/PMs — learnings, product implications, risks
+    engineering.md                       # Devs — architecture, tech debt, data model, key files
+    design.md                            # UX/UI — label recommendations, priorities, research refs
+    marketing.md                         # Content/comms — story, differentiators, what not to promise
+    sales.md                             # Partnerships — the moat, API surface, licensing
   prompts/                               # Reusable AI prompts and build recipes
     build-observation-prototype.md       # Build prompt for observation prototype
     run-prototype-evaluation.md          # Eval prompt (Claude Code + general LLM variants)
@@ -84,9 +89,10 @@ docs/
 |--------|----------|-------------|-------------|
 | `research/` | Findings from any test or evaluation | Number-prefixed (`01-`, `02-`…) so sequence is obvious | After every test round |
 | `design/` | Strategy, briefs, frameworks, thinking notes | Short nouns (`brief.md`, `taxonomy.md`) | When framing a problem or defining an approach |
+| `collab/` | Living context docs for cross-functional partners | Named by audience (`product.md`, `engineering.md`) | One per collaborator type. Each file is self-contained — a teammate (or their AI) reads only their file and has full context. |
 | `prompts/` | Reusable AI prompts and recipes | Verb-prefixed (`build-`, `run-`, `evaluate-`) | When you create a prompt worth re-running |
 
-**For a new project:** copy the three empty folders. Research starts at `01-`. Design gets a `brief.md`. Prompts get named by what they do.
+**For a new project:** copy the four empty folders. Research starts at `01-`. Design gets a `brief.md`. Collab gets one file per partner audience. Prompts get named by what they do.
 
 ---
 
@@ -240,6 +246,7 @@ lib/
 docs/
   research/                 # Numbered test findings (01-, 02-, ...)
   design/                   # Strategy briefs, frameworks, thinking notes
+  collab/                   # Living context docs — one per collaborator audience
   prompts/                  # Reusable AI prompts and build recipes
   images/                   # Screenshots for case study and docs
 ```
