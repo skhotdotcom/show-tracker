@@ -52,3 +52,9 @@ Three layers of proprietary IP — observation, taxonomy, collaboration — desi
 | Classic view | Timeline view | Session view |
 |:---:|:---:|:---:|
 | ![Classic](../images/classic-view.png) | ![Timeline](../images/timeline-view.png) | ![Session](../images/session-view.png) |
+
+---
+
+## Additional Tooling
+
+The marketing skill plugin (`claude-knowledge-work/marketing-plugin/`) has modules for brand voice, campaign planning, content creation, competitive analysis, and performance analytics. Use this doc as your project context, and pull from the plugin when you need structured templates or frameworks.

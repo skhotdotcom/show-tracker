@@ -37,7 +37,22 @@ Three layers of proprietary IP for AI-assisted content discovery — observation
 
 ---
 
-## Risks
+## Status
+
+_Last updated: 2026-03-15_
+
+| What | State | Notes |
+|------|-------|-------|
+| Main app (Classic, Timeline, Session) | Shipped | 3 views, SUS 75.0 |
+| Observation prototype | Built + tested | SUS 74.2, 3 persona eval complete |
+| Response language | Validated, not yet implemented | 8 labels → 5 based on natural language clustering |
+| Language capture variant | Built + tested | 30 responses clustered into 6 intent categories |
+| Collaboration docs | Active | All 5 audience docs updated with IP framing |
+| Design system tokens | Not yet | Needed for engineering consistency |
+
+**Next:** Update response language in prototype (8 → 5), design "I'm in" exit behavior, add design system tokens for engineering.
+
+**Blocked:** —
 
 | Risk | Severity | Mitigation |
 |------|----------|------------|

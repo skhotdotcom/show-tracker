@@ -72,6 +72,51 @@ CREATE TABLE language_capture (
 
 ---
 
+## Design System Tokens
+
+Use these values consistently across all views. All tokens use Tailwind CSS classes.
+
+### Response Categories (Observation Layer)
+
+| Category | Color | Tailwind | Hex |
+|----------|-------|----------|-----|
+| Strong yes | Green | `bg-green-500` | #22c55e |
+| Casual yes | Green (light) | `bg-green-400` | #4ade80 |
+| Maybe / Later | Amber | `bg-amber-500` | #f59e0b |
+| Not tonight | Red (soft) | `bg-red-400` | #f87171 |
+| Not for me | Red (strong) | `bg-red-600` | #dc2626 |
+| Already seen it | Neutral | `bg-gray-500` | #6b7280 |
+
+### Spacing
+
+- Card padding: `p-4` (16px)
+- Card gap (grid): `gap-4` (16px)
+- Section margin: `mb-6` (24px)
+- Button padding: `px-4 py-2` (16px horizontal, 8px vertical)
+
+### Typography
+
+- Card title: `text-lg font-semibold`
+- Description: `text-sm text-muted-foreground`
+- Episode label: `text-xs uppercase tracking-wide`
+- Social rating: `text-sm font-medium text-blue-500`
+- Personal score: `text-sm text-muted-foreground`
+
+### Card Dimensions
+
+- Observation card: max-width `max-w-md` (448px)
+- Show card (Classic/Timeline): `aspect-video` (16:9)
+- Poster image: `aspect-[2/3]` (movie poster ratio)
+- Preview dialog: `max-w-2xl` (672px)
+
+### Animation
+
+- Card advance: `transition-opacity duration-200`
+- Preview open: `animate-in fade-in duration-200`
+- Revision expand: `transition-all duration-150`
+
+---
+
 ## Key Files
 
 | File | Purpose |
