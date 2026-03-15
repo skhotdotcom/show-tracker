@@ -17,7 +17,7 @@ The prototype pipeline:
 3. **Test** — Cognitive walkthroughs with synthetic personas (SUS scoring: 62.5 → 75.0 across 3 rounds). Real user walkthrough with 10 content options.
 4. **Learn** — The observation prototype doesn't just test interaction patterns — it *is* the pattern learning system. Every user response is a calibration signal that makes the next suggestion better.
 
-> "The prototype isn't testing the patterns. The prototype IS the pattern learning system." — [Interaction Pattern Taxonomy](docs/interaction-pattern-taxonomy.md)
+> "The prototype isn't testing the patterns. The prototype IS the pattern learning system." — [Taxonomy](docs/design/taxonomy.md)
 
 The feedback loop: **observe → learn → calibrate → anticipate**. The same macro pattern that powered Shadow Health's conversation AI (2016) and Holmusk's clinical workflow — applied to content discovery.
 
@@ -27,41 +27,46 @@ The feedback loop: **observe → learn → calibrate → anticipate**. The same 
 
 | Date | What Happened | Artifact |
 |------|---------------|----------|
-| **Round 1** | Initial UX evaluation — 3 personas, cognitive walkthroughs, SUS baseline (avg 62.5) | [UX Research](docs/ux-research.md) |
-| **Round 2** | Iteration on feedback — SUS improved to 72.5 avg. Identified interaction backlog. | [UX Research](docs/ux-research.md) |
-| **Round 3** | Session + Timeline views evaluated. SUS reached 75.0. | [UX Research](docs/ux-research.md) |
-| **JTBD Analysis** | Extracted 7 micro-jobs from live observation. Defined energy-aware recommendation model. | [AI Prototype Brief](docs/ai-prototype-brief.md) |
-| **Phase 0 Build** | Observation prototype — single-card suggestion loop with emotional response options and behavioral logging. | [Build Prompt](docs/prompts/phase-0-observation-layer.md) |
-| **Real User Test** | Solo walkthrough of 10 suggestions. Found: response language doesn't match mental model, poster lightbox undiscoverable, TV episode logic broken. | [Test Insights](docs/prototype-test-insights.md) |
-| **Synthetic Eval** | 3-persona evaluation of observation prototype (SUS avg 74.2). Cross-persona language audit. | [Evaluation](docs/observation-prototype-evaluation.md) |
-| **Language Test** | Built open-text variant. 30 synthetic responses clustered into 6 intent categories. Recommended reducing labels from 8 to 6. | [Language Test](docs/observation-language-test.md) |
-| **Taxonomy** | Defined the interaction pattern / component / experience distinction. Mapped behavioral signal stack. Connected to course + article writing. | [Interaction Pattern Taxonomy](docs/interaction-pattern-taxonomy.md) |
+| **Round 1** | Initial UX evaluation — 3 personas, cognitive walkthroughs, SUS baseline (avg 62.5) | [01-baseline-evaluation](docs/research/01-baseline-evaluation.md) |
+| **Round 2** | Iteration on feedback — SUS improved to 72.5 avg. Identified interaction backlog. | [01-baseline-evaluation](docs/research/01-baseline-evaluation.md) |
+| **Round 3** | Session + Timeline views evaluated. SUS reached 75.0. | [01-baseline-evaluation](docs/research/01-baseline-evaluation.md) |
+| **JTBD Analysis** | Extracted 7 micro-jobs from live observation. Defined energy-aware recommendation model. | [brief](docs/design/brief.md) |
+| **Phase 0 Build** | Observation prototype — single-card suggestion loop with emotional response options and behavioral logging. | [build-observation-prototype](docs/prompts/build-observation-prototype.md) |
+| **Real User Test** | Solo walkthrough of 10 suggestions. Found: response language doesn't match mental model, poster lightbox undiscoverable, TV episode logic broken. | [02-prototype-walkthrough](docs/research/02-prototype-walkthrough.md) |
+| **Synthetic Eval** | 3-persona evaluation of observation prototype (SUS avg 74.2). Cross-persona language audit. | [03-prototype-evaluation](docs/research/03-prototype-evaluation.md) |
+| **Language Test** | Built open-text variant. 30 synthetic responses clustered into 6 intent categories. Recommended reducing labels from 8 to 6. | [04-language-test](docs/research/04-language-test.md) |
+| **Taxonomy** | Defined the interaction pattern / component / experience distinction. Mapped behavioral signal stack. Connected to course + article writing. | [taxonomy](docs/design/taxonomy.md) |
 
 ---
 
 ## Documentation Strategy
 
-All documentation lives in `docs/`. No loose `.md` files in the repo root (except this README).
+All documentation lives in `docs/`. No loose `.md` files in the repo root (except this README). Three folders, organized by purpose.
 
 ```
 docs/
-  ai-prototype-brief.md          # JTBD analysis, energy model, prototype specs (P1-P6)
-  interaction-pattern-taxonomy.md # Thinking notes — taxonomy, behavioral signals, macro pattern
-  ux-research.md                  # Rounds 1-3 persona evaluations, SUS scores, 4Ls
-  observation-prototype-evaluation.md  # Synthetic persona eval of observation prototype
-  observation-language-test.md    # Open-text language capture analysis + label recommendations
-  prototype-test-insights.md      # Real user test notes — 8 findings from first walkthrough
-  prompts/
-    phase-0-observation-layer.md           # Build prompt for observation prototype
-    observation-evaluation-claude-code.md  # Evaluation prompt (unbiased persona test)
-    observation-prototype-evaluation.md    # Alternate evaluation prompt
+  research/                              # Findings from tests and evaluations
+    01-baseline-evaluation.md            # Rounds 1-3 persona walkthroughs, SUS scores, 4Ls
+    02-prototype-walkthrough.md          # Real user test — 8 findings from first walkthrough
+    03-prototype-evaluation.md           # Synthetic 3-persona eval (SUS avg 74.2)
+    04-language-test.md                  # Open-text clustering — 8 labels reduced to 6
+  design/                                # Strategy, briefs, frameworks
+    brief.md                             # JTBD analysis, energy model, prototype specs (P1-P6)
+    taxonomy.md                          # Interaction pattern / component / experience distinction
+  prompts/                               # Reusable AI prompts and build recipes
+    build-observation-prototype.md       # Build prompt for observation prototype
+    run-prototype-evaluation.md          # Eval prompt (Claude Code + general LLM variants)
 ```
 
-**What goes where:**
-- **Research findings** (evaluations, test notes, language analysis) → `docs/`
-- **Design artifacts** (briefs, taxonomies) → `docs/`
-- **Prompts** (reusable Claude Code / LLM prompts) → `docs/prompts/`
-- **Code** (prototypes, APIs, components) → `app/`, `lib/`, `components/`
+### How this works as a system
+
+| Folder | Contains | Naming rule | When to add |
+|--------|----------|-------------|-------------|
+| `research/` | Findings from any test or evaluation | Number-prefixed (`01-`, `02-`…) so sequence is obvious | After every test round |
+| `design/` | Strategy, briefs, frameworks, thinking notes | Short nouns (`brief.md`, `taxonomy.md`) | When framing a problem or defining an approach |
+| `prompts/` | Reusable AI prompts and recipes | Verb-prefixed (`build-`, `run-`, `evaluate-`) | When you create a prompt worth re-running |
+
+**For a new project:** copy the three empty folders. Research starts at `01-`. Design gets a `brief.md`. Prompts get named by what they do.
 
 ---
 
@@ -212,5 +217,8 @@ lib/
   tmdb.ts                   # TMDB API client (server-side only)
   ai.ts                     # LM Studio AI client
 
-docs/                       # All research, design, and prompt documentation
+docs/
+  research/                 # Numbered test findings (01-, 02-, ...)
+  design/                   # Strategy briefs, frameworks, thinking notes
+  prompts/                  # Reusable AI prompts and build recipes
 ```
