@@ -20,6 +20,8 @@ export interface Show {
   notes: string | null;
   next_season: number | null;
   next_episode: number | null;
+  genres: string | null;        // JSON-encoded string[], e.g. '["Drama","Sci-Fi"]'
+  tmdb_rating: number | null;   // TMDB vote_average (0–10)
   created_at: string;
   updated_at: string;
 }
@@ -74,6 +76,8 @@ export interface TMDBShowDetails {
   number_of_episodes?: number;
   seasons?: TMDBSeason[];
   next_episode_to_air?: TMDBEpisode | null;
+  genres?: Array<{ id: number; name: string }>;
+  vote_average?: number;
 }
 
 export interface TMDBSeason {
@@ -95,4 +99,36 @@ export interface AIRecommendation {
   title: string;
   type: ShowType;
   reason: string;
+}
+
+// Observation micro-interaction types
+
+export type ObservationResponse =
+  | 'this_is_it'
+  | 'lets_start_it'
+  | 'maybe_later'
+  | 'add_to_queue'
+  | 'not_in_the_mood'
+  | 'not_for_me'
+  | 'not_now'
+  | 'already_seen_it';
+
+export interface SuggestionLog {
+  id: number;
+  content_type: ShowType;
+  title: string;
+  tmdb_id: number;
+  season_number: number | null;
+  episode_number: number | null;
+  episode_title: string | null;
+  episode_description: string | null;
+  social_rating: number | null;
+  personal_score: string | null;
+  response: ObservationResponse;
+  timestamp: string;
+  hour_of_day: number;
+  day_of_week: number;
+  dwell_time_seconds: number | null;
+  revision_count: number;
+  user_rating: number | null;
 }

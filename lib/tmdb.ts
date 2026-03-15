@@ -80,3 +80,7 @@ export async function getTrending(type: 'tv' | 'movie' | 'all' = 'all') {
 export async function getPopular(type: 'tv' | 'movie' = 'tv') {
   return tmdbFetch(`/${type}/popular`);
 }
+
+export async function getCredits(tmdbId: number, type: 'tv' | 'movie') {
+  return tmdbFetch(`/${type}/${tmdbId}/credits`);
+}

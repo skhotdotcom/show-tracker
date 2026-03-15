@@ -4,7 +4,7 @@
 
 import Database from 'better-sqlite3';
 import path from 'path';
-import type { Show } from '@/types';
+import type { Show, SuggestionLog, ObservationResponse } from '@/types';
 
 const DB_PATH = process.env.DATABASE_PATH || path.join(process.cwd(), 'data', 'tracker.db');
 
@@ -80,11 +80,36 @@ function initializeDatabase(database: Database.Database) {
     CREATE INDEX IF NOT EXISTS idx_shows_status ON shows(status);
     CREATE INDEX IF NOT EXISTS idx_shows_type ON shows(type);
     CREATE INDEX IF NOT EXISTS idx_episodes_show ON episodes(show_id);
+
+    CREATE TABLE IF NOT EXISTS suggestion_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      content_type TEXT CHECK(content_type IN ('tv', 'movie')) NOT NULL,
+      title TEXT NOT NULL,
+      tmdb_id INTEGER NOT NULL,
+      season_number INTEGER,
+      episode_number INTEGER,
+      episode_title TEXT,
+      episode_description TEXT,
+      social_rating REAL,
+      personal_score TEXT,
+      response TEXT NOT NULL,
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+      hour_of_day INTEGER NOT NULL,
+      day_of_week INTEGER NOT NULL,
+      dwell_time_seconds REAL,
+      revision_count INTEGER DEFAULT 0,
+      user_rating INTEGER
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_suggestion_log_tmdb ON suggestion_log(tmdb_id);
+    CREATE INDEX IF NOT EXISTS idx_suggestion_log_response ON suggestion_log(response);
   `);
 
   // Migrations — ALTER TABLE is a no-op (caught) if the column already exists.
   try { database.exec(`ALTER TABLE shows ADD COLUMN next_season INTEGER DEFAULT 1`); } catch {}
   try { database.exec(`ALTER TABLE shows ADD COLUMN next_episode INTEGER DEFAULT 1`); } catch {}
+  try { database.exec(`ALTER TABLE shows ADD COLUMN genres TEXT`); } catch {}
+  try { database.exec(`ALTER TABLE shows ADD COLUMN tmdb_rating REAL`); } catch {}
 }
 
 export function getShowsByStatus(status: string): Show[] {
@@ -157,12 +182,14 @@ export interface CreateShowInput {
   status?: 'watching' | 'queued' | 'completed' | 'dropped';
   rating?: number | null;
   notes?: string | null;
+  genres?: string | null;       // JSON string, e.g. '["Drama","Sci-Fi"]'
+  tmdb_rating?: number | null;  // TMDB vote_average
 }
 
 export function createShow(input: CreateShowInput): Show | undefined {
   const stmt = getDb().prepare(`
-    INSERT INTO shows (tmdb_id, title, type, poster_url, backdrop_url, overview, release_date, status, rating, notes)
-    VALUES (@tmdb_id, @title, @type, @poster_url, @backdrop_url, @overview, @release_date, @status, @rating, @notes)
+    INSERT INTO shows (tmdb_id, title, type, poster_url, backdrop_url, overview, release_date, status, rating, notes, genres, tmdb_rating)
+    VALUES (@tmdb_id, @title, @type, @poster_url, @backdrop_url, @overview, @release_date, @status, @rating, @notes, @genres, @tmdb_rating)
   `);
   const result = stmt.run({
     tmdb_id: input.tmdb_id ?? null,
@@ -175,8 +202,16 @@ export function createShow(input: CreateShowInput): Show | undefined {
     status: input.status ?? 'queued',
     rating: input.rating ?? null,
     notes: input.notes ?? null,
+    genres: input.genres ?? null,
+    tmdb_rating: input.tmdb_rating ?? null,
   });
   return getShowById(result.lastInsertRowid as number);
+}
+
+export function updateShowMetadata(id: number, genres: string | null, tmdbRating: number | null): void {
+  getDb().prepare(`
+    UPDATE shows SET genres = ?, tmdb_rating = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+  `).run(genres, tmdbRating, id);
 }
 
 export function updateShowStatus(id: number, status: string): Show | undefined {
@@ -293,6 +328,52 @@ export function clearRecommendations() {
   getDb().prepare(`DELETE FROM recommendations`).run();
 }
 
+export interface GenrePattern {
+  genre: string;
+  count: number;
+  completed: number;
+  dropped: number;
+  avgUserRating: number | null;
+  avgTmdbRating: number | null;
+  completionRate: number | null; // completed / (completed + dropped), null if no finished shows
+}
+
+// Compute per-genre stats from all tracked shows. Genres are stored as a JSON string.
+export function getWatchPatterns(): GenrePattern[] {
+  const shows = getAllShows();
+  const map: Record<string, { count: number; completed: number; dropped: number; userRatings: number[]; tmdbRatings: number[] }> = {};
+
+  for (const show of shows) {
+    if (!show.genres) continue;
+    let genres: string[] = [];
+    try { genres = JSON.parse(show.genres); } catch { continue; }
+
+    for (const genre of genres) {
+      if (!map[genre]) map[genre] = { count: 0, completed: 0, dropped: 0, userRatings: [], tmdbRatings: [] };
+      map[genre].count++;
+      if (show.status === 'completed') map[genre].completed++;
+      if (show.status === 'dropped') map[genre].dropped++;
+      if (show.rating != null) map[genre].userRatings.push(show.rating);
+      if (show.tmdb_rating != null) map[genre].tmdbRatings.push(show.tmdb_rating);
+    }
+  }
+
+  return Object.entries(map)
+    .map(([genre, s]) => {
+      const finished = s.completed + s.dropped;
+      return {
+        genre,
+        count: s.count,
+        completed: s.completed,
+        dropped: s.dropped,
+        avgUserRating: s.userRatings.length ? s.userRatings.reduce((a, b) => a + b, 0) / s.userRatings.length : null,
+        avgTmdbRating: s.tmdbRatings.length ? s.tmdbRatings.reduce((a, b) => a + b, 0) / s.tmdbRatings.length : null,
+        completionRate: finished > 0 ? s.completed / finished : null,
+      };
+    })
+    .sort((a, b) => b.count - a.count);
+}
+
 export function getStats() {
   const stats = getDb().prepare(`
     SELECT 
@@ -305,6 +386,70 @@ export function getStats() {
     FROM shows
   `).get();
   return stats;
+}
+
+// --- Observation / Suggestion Log ---
+
+export interface CreateObservationInput {
+  content_type: 'tv' | 'movie';
+  title: string;
+  tmdb_id: number;
+  season_number?: number | null;
+  episode_number?: number | null;
+  episode_title?: string | null;
+  episode_description?: string | null;
+  social_rating?: number | null;
+  personal_score?: string | null;
+  response: ObservationResponse;
+  dwell_time_seconds?: number | null;
+  user_rating?: number | null;
+}
+
+export function logObservation(input: CreateObservationInput): SuggestionLog {
+  const now = new Date();
+  const stmt = getDb().prepare(`
+    INSERT INTO suggestion_log (content_type, title, tmdb_id, season_number, episode_number, episode_title, episode_description, social_rating, personal_score, response, hour_of_day, day_of_week, dwell_time_seconds, revision_count, user_rating)
+    VALUES (@content_type, @title, @tmdb_id, @season_number, @episode_number, @episode_title, @episode_description, @social_rating, @personal_score, @response, @hour_of_day, @day_of_week, @dwell_time_seconds, 0, @user_rating)
+  `);
+  const result = stmt.run({
+    content_type: input.content_type,
+    title: input.title,
+    tmdb_id: input.tmdb_id,
+    season_number: input.season_number ?? null,
+    episode_number: input.episode_number ?? null,
+    episode_title: input.episode_title ?? null,
+    episode_description: input.episode_description ?? null,
+    social_rating: input.social_rating ?? null,
+    personal_score: input.personal_score ?? null,
+    response: input.response,
+    hour_of_day: now.getHours(),
+    day_of_week: now.getDay(),
+    dwell_time_seconds: input.dwell_time_seconds ?? null,
+    user_rating: input.user_rating ?? null,
+  });
+  return getDb().prepare('SELECT * FROM suggestion_log WHERE id = ?').get(result.lastInsertRowid) as SuggestionLog;
+}
+
+export function getObservations(limit = 50): SuggestionLog[] {
+  return getDb().prepare(`
+    SELECT * FROM suggestion_log ORDER BY timestamp DESC LIMIT ?
+  `).all(limit) as SuggestionLog[];
+}
+
+export function updateObservationResponse(id: number, response: ObservationResponse, userRating?: number | null): SuggestionLog | undefined {
+  const row = getDb().prepare('SELECT * FROM suggestion_log WHERE id = ?').get(id) as SuggestionLog | undefined;
+  if (!row) return undefined;
+  const newRevisionCount = row.revision_count + 1;
+  if (userRating !== undefined) {
+    getDb().prepare(`
+      UPDATE suggestion_log SET response = ?, revision_count = ?, user_rating = ? WHERE id = ?
+    `).run(response, newRevisionCount, userRating, id);
+  } else {
+    getDb().prepare(`
+      UPDATE suggestion_log SET response = ?, revision_count = ? WHERE id = ?
+    `).run(response, newRevisionCount, id);
+  }
+  return getDb().prepare('SELECT * FROM suggestion_log WHERE id = ?').get(id) as SuggestionLog;
 }
 
 export { getDb };
