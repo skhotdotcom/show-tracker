@@ -75,6 +75,8 @@ docs/
     03-prototype-evaluation.md           # Synthetic 3-persona eval (SUS avg 74.2)
     04-language-test.md                  # Open-text clustering — 8 labels reduced to 6
   design/                                # Strategy, briefs, frameworks
+    lean-strategy-canvas.md              # Gothelf & Seiden — goal, obstacles, strategy, OKRs
+    lean-product-canvas.md               # Gothelf & Seiden — problem, outcomes, users, JTBD, hypotheses
     brief.md                             # JTBD analysis, energy model, prototype specs (P1-P6)
     taxonomy.md                          # Interaction pattern / component / experience distinction
   collab/                                # Living context docs — one per collaborator audience
