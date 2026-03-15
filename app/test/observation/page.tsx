@@ -39,13 +39,11 @@ interface ResponseOption {
 }
 
 const RESPONSE_OPTIONS: ResponseOption[] = [
-  { value: 'this_is_it', label: 'This is it', category: 'immediate', description: 'Strong match, let\'s go' },
-  { value: 'lets_start_it', label: 'Let\'s start it', category: 'immediate', description: 'Willing, casual interest' },
-  { value: 'maybe_later', label: 'Maybe later', category: 'delayed', description: 'Not right now, but keep it alive' },
-  { value: 'add_to_queue', label: 'Add to my queue', category: 'delayed', description: 'Committed, will watch' },
-  { value: 'not_in_the_mood', label: 'Not in the mood', category: 'rejection', description: 'Right show, wrong moment' },
+  { value: 'im_in', label: "I'm in", category: 'immediate', description: 'Strong match — stop searching, start watching' },
+  { value: 'id_watch_this', label: "I'd watch this", category: 'immediate', description: 'Casual interest, willing to start' },
+  { value: 'keep_on_radar', label: 'Keep it on my radar', category: 'delayed', description: 'Not now, but don\'t forget it' },
+  { value: 'not_tonight', label: 'Not tonight', category: 'rejection', description: 'Right show, wrong moment' },
   { value: 'not_for_me', label: 'Not for me', category: 'rejection', description: 'Wrong show entirely' },
-  { value: 'not_now', label: 'Not now', category: 'rejection', description: 'Neutral, no strong feeling' },
   { value: 'already_seen_it', label: 'Already seen it', category: 'rejection', description: 'Rate it below' },
 ];
 

@@ -104,13 +104,11 @@ export interface AIRecommendation {
 // Observation micro-interaction types
 
 export type ObservationResponse =
-  | 'this_is_it'
-  | 'lets_start_it'
-  | 'maybe_later'
-  | 'add_to_queue'
-  | 'not_in_the_mood'
+  | 'im_in'
+  | 'id_watch_this'
+  | 'keep_on_radar'
+  | 'not_tonight'
   | 'not_for_me'
-  | 'not_now'
   | 'already_seen_it';
 
 export interface SuggestionLog {
