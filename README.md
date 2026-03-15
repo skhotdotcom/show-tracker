@@ -2,7 +2,11 @@
 
 A local-first app for tracking what you watch — and a reusable module for AI-assisted content discovery. Built with Next.js, SQLite, and TMDB. AI features powered by a local LLM via LM Studio.
 
-**Note:** This is a research prototype. The observation layer and interaction patterns are designed to be extracted as a standalone module for integration into streaming platforms, recommendation engines, and AI-powered customer experiences.
+**Note:** This is a research prototype. Three layers of IP are designed to be extracted as standalone modules:
+
+1. **Observation Layer** — the emotional response suggestion loop and behavioral logging (for streaming platforms, recommendation engines, AI-powered customer experiences)
+2. **Interaction Pattern Taxonomy** — the pattern/component/experience distinction, behavioral signal stack, emotional job framework (for design teams and AI prototyping workflows)
+3. **Collaboration Framework** — living context docs designed for cross-functional teams and their AI agents, where each collaborator audience has a self-contained reference file their AI can read independently (for product teams, agencies, and AI-assisted workflows)
 
 ---
 
