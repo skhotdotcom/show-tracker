@@ -90,6 +90,16 @@ export async function getVideos(tmdbId: number, type: 'tv' | 'movie') {
   return data.results || [];
 }
 
+export async function getEpisodeVideos(tmdbId: number, season: number, episode: number) {
+  const data = await tmdbFetch(`/tv/${tmdbId}/season/${season}/episode/${episode}/videos`);
+  return data.results || [];
+}
+
+export async function getSeasonVideos(tmdbId: number, season: number) {
+  const data = await tmdbFetch(`/tv/${tmdbId}/season/${season}/videos`);
+  return data.results || [];
+}
+
 export function getTrailerUrl(videos: any[]): string | null {
   const trailer = videos.find(
     (v: any) => v.type === 'Trailer' && v.site === 'YouTube' && v.official

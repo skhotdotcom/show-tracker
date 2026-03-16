@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getTrending, getShowDetails, getEpisodeDetails, getCredits, getVideos, getTrailerUrl, getPosterUrl, getBackdropUrl } from '@/lib/tmdb';
-import { getAllShows, getWatchPatterns } from '@/lib/db';
+import { getTrending, getShowDetails, getEpisodeDetails, getCredits, getVideos, getEpisodeVideos, getSeasonVideos, getTrailerUrl, getPosterUrl, getBackdropUrl } from '@/lib/tmdb';
+import { getAllShows, getWatchPatterns, getObservedTmdbIds } from '@/lib/db';
 
 // Returns a batch of suggestion cards (mix of TV episodes and movies)
 // enriched with episode-level data for TV shows.
@@ -13,14 +13,15 @@ export async function GET() {
 
     const existingShows = getAllShows();
     const existingTmdbIds = new Set(existingShows.map(s => s.tmdb_id));
+    const observedTmdbIds = getObservedTmdbIds();
     const patterns = getWatchPatterns();
 
-    // Filter out shows already in the user's library
+    // Filter out shows already in the user's library or previously observed
     const tvResults = (tvTrending.results || [])
-      .filter((r: any) => !existingTmdbIds.has(r.id))
+      .filter((r: any) => !existingTmdbIds.has(r.id) && !observedTmdbIds.has(r.id))
       .slice(0, 5);
     const movieResults = (movieTrending.results || [])
-      .filter((r: any) => !existingTmdbIds.has(r.id))
+      .filter((r: any) => !existingTmdbIds.has(r.id) && !observedTmdbIds.has(r.id))
       .slice(0, 5);
 
     // Build suggestion cards
@@ -30,26 +31,15 @@ export async function GET() {
           const details = await getShowDetails(show.id, 'tv');
           const genres = (details.genres || []).map((g: any) => g.name);
 
-          // Try to get latest episode details
+          // Always start at S1E1 — users wouldn't start a series in the middle
           let episodeData: any = null;
           let episodePoster: string | null = null;
-          if (details.last_episode_to_air) {
-            const ep = details.last_episode_to_air;
-            try {
-              episodeData = await getEpisodeDetails(show.id, ep.season_number, ep.episode_number);
-              episodePoster = episodeData.still_path
-                ? getPosterUrl(episodeData.still_path, 'w500')
-                : null;
-            } catch { /* fallback to series poster */ }
-          } else if (details.next_episode_to_air) {
-            const ep = details.next_episode_to_air;
-            try {
-              episodeData = await getEpisodeDetails(show.id, ep.season_number, ep.episode_number);
-              episodePoster = episodeData.still_path
-                ? getPosterUrl(episodeData.still_path, 'w500')
-                : null;
-            } catch { /* fallback */ }
-          }
+          try {
+            episodeData = await getEpisodeDetails(show.id, 1, 1);
+            episodePoster = episodeData.still_path
+              ? getPosterUrl(episodeData.still_path, 'w500')
+              : null;
+          } catch { /* fallback to series poster */ }
 
           // Get top-billed cast
           let cast: any[] = [];
@@ -65,11 +55,21 @@ export async function GET() {
           // Personal score based on genre match
           const personalScore = computePersonalScore(genres, patterns, existingShows);
 
-          // Get trailer
+          // Get trailer — try episode-specific, then season, then series
           let trailerUrl: string | null = null;
           try {
-            const videos = await getVideos(show.id, 'tv');
-            trailerUrl = getTrailerUrl(videos);
+            if (episodeData) {
+              const epVideos = await getEpisodeVideos(show.id, episodeData.season_number, episodeData.episode_number);
+              trailerUrl = getTrailerUrl(epVideos);
+            }
+            if (!trailerUrl) {
+              const seasonVideos = await getSeasonVideos(show.id, episodeData?.season_number || 1);
+              trailerUrl = getTrailerUrl(seasonVideos);
+            }
+            if (!trailerUrl) {
+              const seriesVideos = await getVideos(show.id, 'tv');
+              trailerUrl = getTrailerUrl(seriesVideos);
+            }
           } catch { /* no trailer */ }
 
           return {
@@ -94,6 +94,7 @@ export async function GET() {
             cast,
             tagline: details.tagline || null,
             trailer_url: trailerUrl,
+            original_language: details.original_language || show.original_language || null,
           };
         } catch {
           return null;
@@ -145,6 +146,7 @@ export async function GET() {
             tagline: details.tagline || null,
             runtime: details.runtime || null,
             trailer_url: trailerUrl,
+            original_language: details.original_language || movie.original_language || null,
           };
         } catch {
           return null;
@@ -161,6 +163,7 @@ export async function GET() {
 
     return NextResponse.json(valid);
   } catch (error: any) {
+    console.error('Suggestions API error:', error);
     return NextResponse.json({ error: error.message || 'Failed to fetch suggestions' }, { status: 500 });
   }
 }

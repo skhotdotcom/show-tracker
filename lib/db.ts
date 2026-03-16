@@ -492,10 +492,17 @@ export function logObservation(input: CreateObservationInput): SuggestionLog {
   return getDb().prepare('SELECT * FROM suggestion_log WHERE id = ?').get(result.lastInsertRowid) as SuggestionLog;
 }
 
-export function getObservations(limit = 50): SuggestionLog[] {
+export function getObservations(limit = 50, offset = 0): SuggestionLog[] {
   return getDb().prepare(`
-    SELECT * FROM suggestion_log ORDER BY timestamp DESC LIMIT ?
-  `).all(limit) as SuggestionLog[];
+    SELECT * FROM suggestion_log ORDER BY timestamp DESC LIMIT ? OFFSET ?
+  `).all(limit, offset) as SuggestionLog[];
+}
+
+export function getObservedTmdbIds(): Set<number> {
+  const rows = getDb().prepare(`
+    SELECT DISTINCT tmdb_id FROM suggestion_log WHERE tmdb_id IS NOT NULL
+  `).all() as { tmdb_id: number }[];
+  return new Set(rows.map(r => r.tmdb_id));
 }
 
 export function updateObservationResponse(id: number, response: ObservationResponse, userRating?: number | null): SuggestionLog | undefined {

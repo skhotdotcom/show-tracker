@@ -10,7 +10,8 @@ const VALID_RESPONSES: ObservationResponse[] = [
 
 export async function GET(request: NextRequest) {
   const limit = parseInt(request.nextUrl.searchParams.get('limit') || '50', 10);
-  const observations = getObservations(limit);
+  const offset = parseInt(request.nextUrl.searchParams.get('offset') || '0', 10);
+  const observations = getObservations(limit, offset);
   return NextResponse.json(observations);
 }
 
