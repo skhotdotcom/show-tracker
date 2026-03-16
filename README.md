@@ -22,7 +22,7 @@ Three views, each a different mental model for the same library:
 
 | Classic — status buckets | Timeline — urgency + schedule | Session — "what should I watch?" |
 |:---:|:---:|:---:|
-| ![Classic view](docs/images/classic-view.png) | ![Timeline view](docs/images/timeline-view.png) | ![Session view](docs/images/session-view.png) |
+| ![Classic view](docs/screenshots/original/classic-view.png) | ![Timeline view](docs/screenshots/original/timeline-view.png) | ![Session view](docs/screenshots/original/session-view.png) |
 | Watch Patterns, Continue Watching, Watch Next, History | Now carousel with urgency badges, This Week air dates | Ranked suggestions with reason text, Available grid |
 
 ### The Observation Prototype
@@ -31,7 +31,7 @@ The research instrument: one card at a time, emotional response labels, behavior
 
 | Suggestion card + responses | Preview dialog | Language capture variant |
 |:---:|:---:|:---:|
-| ![Observation card](docs/images/observation-card.png) | ![Preview dialog](docs/images/observation-preview.png) | ![Language capture](docs/images/language-capture.png) |
+| ![Observation card](docs/screenshots/original/observation-card.png) | ![Preview dialog](docs/screenshots/original/observation-preview.png) | ![Language capture](docs/screenshots/original/language-capture.png) |
 | "How do you feel about this one?" — 8 response options across 3 intent categories, revision history below | Poster click opens cast, backdrop, extended description — the "tell me more" moment | Open-text variant for natural language clustering |
 
 ### The Pipeline
@@ -74,21 +74,29 @@ docs/
     02-prototype-walkthrough.md          # Real user test — 8 findings from first walkthrough
     03-prototype-evaluation.md           # Synthetic 3-persona eval (SUS avg 74.2)
     04-language-test.md                  # Open-text clustering — 8 labels reduced to 6
+    05-likert-evaluation.md              # Likert variant eval — both evaluations + combined analysis
   design/                                # Strategy, briefs, frameworks
     lean-strategy-canvas.md              # Gothelf & Seiden — goal, obstacles, strategy, OKRs
     lean-product-canvas.md               # Gothelf & Seiden — problem, outcomes, users, JTBD, hypotheses
     brief.md                             # JTBD analysis, energy model, prototype specs (P1-P6)
     taxonomy.md                          # Interaction pattern / component / experience distinction
+    cyclical-methodology.md              # Discovery/delivery cycles — how the work moves
+    value-stream.md                      # 7 moments of value — consumer experience
+    implementation-plan.md               # Cycle-based roadmap to SUS 92
   collab/                                # Living context docs — one per collaborator audience
-    product.md                           # Leadership/PMs — learnings, product implications, risks
-    engineering.md                       # Devs — architecture, tech debt, data model, key files
+    product.md                           # Leadership/PMs — learnings, product implications, status
+    engineering.md                       # Devs — architecture, tech debt, data model, design tokens
     design.md                            # UX/UI — label recommendations, priorities, research refs
     marketing.md                         # Content/comms — story, differentiators, what not to promise
     sales.md                             # Partnerships — the moat, API surface, licensing
   prompts/                               # Reusable AI prompts and build recipes
     build-observation-prototype.md       # Build prompt for observation prototype
+    build-likert-variant.md              # Build prompt for Likert + diagnostic sub-level variant
     run-prototype-evaluation.md          # Eval prompt (general LLM)
-  images/                                # Screenshots for research and documentation
+    evaluate-likert-variant.md           # Eval prompt for Likert variant
+  screenshots/                           # UI screenshots — one folder per variant
+    original/                            # Flat layout screenshots (card, preview, views)
+    likert/                              # Likert variant screenshots (scale, sub-levels, toast)
 ```
 
 ### How this works as a system
@@ -256,7 +264,7 @@ docs/
   design/                   # Strategy briefs, frameworks, thinking notes
   collab/                   # Living context docs — one per collaborator audience
   prompts/                  # Reusable AI prompts and build recipes
-  images/                   # Screenshots for research and documentation
+  screenshots/              # UI screenshots — one folder per variant
 ```
 
 ---
