@@ -84,3 +84,20 @@ export async function getPopular(type: 'tv' | 'movie' = 'tv') {
 export async function getCredits(tmdbId: number, type: 'tv' | 'movie') {
   return tmdbFetch(`/${type}/${tmdbId}/credits`);
 }
+
+export async function getVideos(tmdbId: number, type: 'tv' | 'movie') {
+  const data = await tmdbFetch(`/${type}/${tmdbId}/videos`);
+  return data.results || [];
+}
+
+export function getTrailerUrl(videos: any[]): string | null {
+  const trailer = videos.find(
+    (v: any) => v.type === 'Trailer' && v.site === 'YouTube' && v.official
+  ) || videos.find(
+    (v: any) => v.type === 'Trailer' && v.site === 'YouTube'
+  ) || videos.find(
+    (v: any) => v.site === 'YouTube'
+  );
+  if (!trailer) return null;
+  return `https://www.youtube.com/embed/${trailer.key}?autoplay=1&mute=1`;
+}

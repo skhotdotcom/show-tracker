@@ -29,6 +29,7 @@ interface Suggestion {
   cast: { name: string; character: string; profile_path: string | null }[];
   tagline: string | null;
   runtime?: number | null;
+  trailer_url: string | null;
 }
 
 // --- Likert options ---
@@ -113,6 +114,7 @@ export default function LikertObservationPage() {
   const [loading, setLoading] = useState(true);
   const [responding, setResponding] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [trailerUrl, setTrailerUrl] = useState<string | null>(null);
   const [expandedOption, setExpandedOption] = useState<ObservationResponse | null>(null);
   const [showAlreadySeen, setShowAlreadySeen] = useState(false);
   const [toast, setToast] = useState<{ title: string; emoji: string; label: string; committed: boolean } | null>(null);
@@ -340,7 +342,15 @@ export default function LikertObservationPage() {
         {/* Suggestion Card */}
         <SuggestionCard
           suggestion={current}
-          onPosterClick={() => setPreviewOpen(true)}
+          onPosterClick={() => {
+            if (trailerUrl) {
+              setTrailerUrl(null); // close trailer if already open
+            } else if (current?.trailer_url) {
+              setTrailerUrl(current.trailer_url);
+            } else {
+              setTrailerUrl(null); // no trailer available
+            }
+          }}
         />
 
         {/* Likert Question */}
@@ -464,12 +474,29 @@ export default function LikertObservationPage() {
           <HistoryPanel history={history} />
         )}
 
-        {/* Preview Dialog */}
-        <PreviewDialog
-          open={previewOpen}
-          onOpenChange={setPreviewOpen}
-          suggestion={current}
-        />
+        {/* Inline Trailer Player */}
+        {trailerUrl && current && (
+          <div className="rounded-xl overflow-hidden border border-border bg-card">
+            <div className="relative w-full aspect-video">
+              <iframe
+                src={trailerUrl}
+                title={`${current.title} trailer`}
+                className="w-full h-full"
+                allow="autoplay; encrypted-media"
+                allowFullScreen
+              />
+            </div>
+            <div className="p-3 flex justify-between items-center">
+              <p className="text-sm font-medium">{current.title} — Trailer</p>
+              <button
+                onClick={() => setTrailerUrl(null)}
+                className="text-xs text-muted-foreground hover:text-foreground"
+              >
+                Close trailer
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Toast */}
         {toast && (
@@ -532,7 +559,7 @@ function SuggestionCard({ suggestion: s, onPosterClick }: { suggestion: Suggesti
         </div>
         <div className="absolute top-3 right-3">
           <Badge variant="secondary" className="bg-black/60 text-white border-0 text-[10px]">
-            <Eye className="size-3 mr-1" /> Tap for details
+            <Eye className="size-3 mr-1" /> Play trailer
           </Badge>
         </div>
         <div className="absolute bottom-0 left-0 right-0 p-4">
@@ -546,14 +573,32 @@ function SuggestionCard({ suggestion: s, onPosterClick }: { suggestion: Suggesti
       </button>
 
       <div className="p-4 space-y-3">
-        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+        {s.tagline && (
+          <p className="text-xs italic text-muted-foreground/70">&ldquo;{s.tagline}&rdquo;</p>
+        )}
+
+        <p className="text-sm text-muted-foreground leading-relaxed">
           {s.content_type === 'tv' && s.episode_description
             ? s.episode_description
             : s.overview || 'No description available.'}
         </p>
 
-        {s.content_type === 'movie' && s.tagline && (
-          <p className="text-xs italic text-muted-foreground/70">&ldquo;{s.tagline}&rdquo;</p>
+        {s.content_type === 'tv' && s.episode_description && s.overview && (
+          <details className="text-sm">
+            <summary className="text-xs text-muted-foreground/60 cursor-pointer hover:text-muted-foreground">
+              Series overview
+            </summary>
+            <p className="text-sm text-muted-foreground mt-1">{s.overview}</p>
+          </details>
+        )}
+
+        {s.cast.length > 0 && (
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Cast</p>
+            <p className="text-sm text-muted-foreground">
+              {s.cast.map(c => c.name).join(', ')}
+            </p>
+          </div>
         )}
 
         <div className="flex items-center gap-3 flex-wrap text-xs text-muted-foreground">

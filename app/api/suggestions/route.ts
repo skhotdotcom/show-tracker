@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getTrending, getShowDetails, getEpisodeDetails, getCredits, getPosterUrl, getBackdropUrl } from '@/lib/tmdb';
+import { getTrending, getShowDetails, getEpisodeDetails, getCredits, getVideos, getTrailerUrl, getPosterUrl, getBackdropUrl } from '@/lib/tmdb';
 import { getAllShows, getWatchPatterns } from '@/lib/db';
 
 // Returns a batch of suggestion cards (mix of TV episodes and movies)
@@ -65,6 +65,13 @@ export async function GET() {
           // Personal score based on genre match
           const personalScore = computePersonalScore(genres, patterns, existingShows);
 
+          // Get trailer
+          let trailerUrl: string | null = null;
+          try {
+            const videos = await getVideos(show.id, 'tv');
+            trailerUrl = getTrailerUrl(videos);
+          } catch { /* no trailer */ }
+
           return {
             content_type: 'tv' as const,
             tmdb_id: show.id,
@@ -86,6 +93,7 @@ export async function GET() {
             personal_score: personalScore,
             cast,
             tagline: details.tagline || null,
+            trailer_url: trailerUrl,
           };
         } catch {
           return null;
@@ -109,6 +117,13 @@ export async function GET() {
 
           const personalScore = computePersonalScore(genres, patterns, existingShows);
 
+          // Get trailer
+          let trailerUrl: string | null = null;
+          try {
+            const videos = await getVideos(movie.id, 'movie');
+            trailerUrl = getTrailerUrl(videos);
+          } catch { /* no trailer */ }
+
           return {
             content_type: 'movie' as const,
             tmdb_id: movie.id,
@@ -129,6 +144,7 @@ export async function GET() {
             cast,
             tagline: details.tagline || null,
             runtime: details.runtime || null,
+            trailer_url: trailerUrl,
           };
         } catch {
           return null;
