@@ -94,9 +94,17 @@ Two opportunities, one cycle:
 
 Stars are wrong. Behavioral language captures the experience. "Because you watched X" builds recommendation confidence.
 
+**Two-level interaction pattern** — top-level: "Are you interested?" (Yes / Maybe / No). Second level branches into specific response:
+- Yes → "I'm in" / "I'd watch this"
+- Maybe → "Keep it on my radar"
+- No → "Not tonight" / "Not for me"
+
+"Already seen it" stays as a separate route to post-watch rating flow.
+
 | Task | Status | Depends On |
 |------|--------|------------|
-| Design post-watch response options (behavioral language) | Not started | — |
+| Design two-level response interaction (3 → 5 branching) | Not started | — |
+| Design post-watch behavioral rating options | Not started | — |
 | Map responses to personal score reasoning | Not started | Response options |
 | "Because you watched X, Y, Z" recommendation justification | Not started | Score reasoning |
 
