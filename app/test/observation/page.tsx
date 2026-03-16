@@ -34,7 +34,7 @@ interface Suggestion {
 interface ResponseOption {
   value: ObservationResponse;
   label: string;
-  category: 'immediate' | 'delayed' | 'rejection';
+  category: 'immediate' | 'delayed' | 'rejection' | 'past';
   description: string;
 }
 
@@ -44,7 +44,7 @@ const RESPONSE_OPTIONS: ResponseOption[] = [
   { value: 'keep_on_radar', label: 'Keep it on my radar', category: 'delayed', description: 'Not now, but don\'t forget it' },
   { value: 'not_tonight', label: 'Not tonight', category: 'rejection', description: 'Right show, wrong moment' },
   { value: 'not_for_me', label: 'Not for me', category: 'rejection', description: 'Wrong show entirely' },
-  { value: 'already_seen_it', label: 'Already seen it', category: 'rejection', description: 'Rate it below' },
+  { value: 'already_seen_it', label: 'Already seen it', category: 'past', description: 'Route to rating flow' },
 ];
 
 const RESPONSE_LABELS: Record<string, string> = Object.fromEntries(
@@ -55,6 +55,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   immediate: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
   delayed: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
   rejection: 'bg-red-500/20 text-red-400 border-red-500/30',
+  past: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
 };
 
 // --- Main Page ---
