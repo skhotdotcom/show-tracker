@@ -26,13 +26,33 @@ Each cycle:
 
 ---
 
-## Current Cycle: Response Language + Trust
+## Current Cycle: Likert + Diagnostic Sub-Level
 
-The first cycle focuses on what the customer says (response language) and whether the system confirms it heard them (trust). These aren't sequential steps — they're one learning loop. Build both, test both, learn from both.
+The first cycle is a redesign of the response interaction — from flat 6-button layout to a 5-point Likert scale with position-specific diagnostic sub-levels.
+
+**Top-level question: "Are you interested?"**
+
+| Position | Label | Likert Equivalent | Sub-Level Purpose |
+|----------|-------|-------------------|-------------------|
+| 1 | I'm in | Strongly agree | Exit — go directly to content. No sub-level. |
+| 2 | I'd watch this | Somewhat agree | What's pulling you in? (cast, genre, rating, description) |
+| 3 | I'm curious | Neutral | What are you curious about? (open exploration) |
+| 4 | Doesn't grab me | Somewhat disagree | What's missing? (timing, tone, genre, awareness) |
+| 5 | Not for me | Strongly disagree | What's the boundary? (genre, cast, premise, era) |
+| — | Already seen it | (separate path) | Rating flow (behavioral language) |
+
+**Design principles:**
+- Top-level is the decision moment. Sub-level is the diagnostic.
+- "I'm in" has no sub-level — it's an exit signal, not a data collection moment.
+- Sub-levels are optional — "Skip sub-feedback" visible on every screen.
+- Each sub-level learns a different type of insight (pull factors, curiosity, friction, boundaries).
+
+**Related taxonomy:**
+- **Interaction Pattern:** "Are you interested?" → 5-point scale → position-specific diagnostic
+- **Component:** Observation card (single card, centered, one-at-a-time)
+- **Experience:** Discovery session (customer decides what to watch, system learns from decision)
 
 ---
-
-## Response Language (Cycle 1 — Discovery + Delivery)
 
 Everything else depends on this. The prototype still uses 8 labels. Reduce to 5 + "Already seen it" based on validated natural language clustering.
 
