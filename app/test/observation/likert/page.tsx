@@ -530,9 +530,9 @@ function SuggestionCard({ suggestion: s, onPosterClick }: { suggestion: Suggesti
             {s.content_type === 'tv' ? 'TV Series' : 'Movie'}
           </Badge>
         </div>
-        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute top-3 right-3">
           <Badge variant="secondary" className="bg-black/60 text-white border-0 text-[10px]">
-            <Eye className="size-3 mr-1" /> Preview
+            <Eye className="size-3 mr-1" /> Tap for details
           </Badge>
         </div>
         <div className="absolute bottom-0 left-0 right-0 p-4">
