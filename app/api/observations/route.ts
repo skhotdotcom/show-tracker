@@ -5,6 +5,7 @@ import type { ObservationResponse } from '@/types';
 const VALID_RESPONSES: ObservationResponse[] = [
   'im_in', 'id_watch_this', 'keep_on_radar',
   'not_tonight', 'not_for_me', 'already_seen_it',
+  'im_curious', 'doesnt_grab_me',
 ];
 
 export async function GET(request: NextRequest) {
@@ -36,6 +37,7 @@ export async function POST(request: NextRequest) {
     response: body.response,
     dwell_time_seconds: body.dwell_time_seconds ?? null,
     user_rating: body.user_rating ?? null,
+    sub_response: body.sub_response ?? null,
   });
 
   return NextResponse.json(observation, { status: 201 });

@@ -123,6 +123,7 @@ function initializeDatabase(database: Database.Database) {
   try { database.exec(`ALTER TABLE shows ADD COLUMN next_episode INTEGER DEFAULT 1`); } catch {}
   try { database.exec(`ALTER TABLE shows ADD COLUMN genres TEXT`); } catch {}
   try { database.exec(`ALTER TABLE shows ADD COLUMN tmdb_rating REAL`); } catch {}
+  try { database.exec(`ALTER TABLE suggestion_log ADD COLUMN sub_response TEXT`); } catch {}
 }
 
 export function getShowsByStatus(status: string): Show[] {
@@ -462,13 +463,14 @@ export interface CreateObservationInput {
   response: ObservationResponse;
   dwell_time_seconds?: number | null;
   user_rating?: number | null;
+  sub_response?: string | null;
 }
 
 export function logObservation(input: CreateObservationInput): SuggestionLog {
   const now = new Date();
   const stmt = getDb().prepare(`
-    INSERT INTO suggestion_log (content_type, title, tmdb_id, season_number, episode_number, episode_title, episode_description, social_rating, personal_score, response, hour_of_day, day_of_week, dwell_time_seconds, revision_count, user_rating)
-    VALUES (@content_type, @title, @tmdb_id, @season_number, @episode_number, @episode_title, @episode_description, @social_rating, @personal_score, @response, @hour_of_day, @day_of_week, @dwell_time_seconds, 0, @user_rating)
+    INSERT INTO suggestion_log (content_type, title, tmdb_id, season_number, episode_number, episode_title, episode_description, social_rating, personal_score, response, hour_of_day, day_of_week, dwell_time_seconds, revision_count, user_rating, sub_response)
+    VALUES (@content_type, @title, @tmdb_id, @season_number, @episode_number, @episode_title, @episode_description, @social_rating, @personal_score, @response, @hour_of_day, @day_of_week, @dwell_time_seconds, 0, @user_rating, @sub_response)
   `);
   const result = stmt.run({
     content_type: input.content_type,
@@ -485,6 +487,7 @@ export function logObservation(input: CreateObservationInput): SuggestionLog {
     day_of_week: now.getDay(),
     dwell_time_seconds: input.dwell_time_seconds ?? null,
     user_rating: input.user_rating ?? null,
+    sub_response: input.sub_response ?? null,
   });
   return getDb().prepare('SELECT * FROM suggestion_log WHERE id = ?').get(result.lastInsertRowid) as SuggestionLog;
 }

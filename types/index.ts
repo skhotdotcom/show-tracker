@@ -109,7 +109,11 @@ export type ObservationResponse =
   | 'keep_on_radar'
   | 'not_tonight'
   | 'not_for_me'
-  | 'already_seen_it';
+  | 'already_seen_it'
+  | 'im_curious'
+  | 'doesnt_grab_me';
+
+export type SubResponse = string;
 
 export interface SuggestionLog {
   id: number;
@@ -129,4 +133,5 @@ export interface SuggestionLog {
   dwell_time_seconds: number | null;
   revision_count: number;
   user_rating: number | null;
+  sub_response: string | null;
 }
