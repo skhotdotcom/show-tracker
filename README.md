@@ -65,50 +65,16 @@ The feedback loop: **observe → learn → calibrate → anticipate**. The same 
 
 ## Documentation Strategy
 
-All documentation lives in `docs/`. No loose `.md` files in the repo root (except this README). Four folders, organized by purpose.
+All documentation lives in `docs/`. No loose `.md` files in the repo root (except this README). The full documentation strategy — folder rules, naming conventions, when to add files, and how this works for both humans and AI agents — is in [`docs/DOCUMENTATION-STRATEGY.md`](docs/DOCUMENTATION-STRATEGY.md).
 
 ```
 docs/
   research/                              # Findings from tests and evaluations
-    01-baseline-evaluation.md            # Rounds 1-3 persona walkthroughs, SUS scores, 4Ls
-    02-prototype-walkthrough.md          # Real user test — 8 findings from first walkthrough
-    03-prototype-evaluation.md           # Synthetic 3-persona eval (SUS avg 74.2)
-    04-language-test.md                  # Open-text clustering — 8 labels reduced to 6
-    05-likert-evaluation.md              # Likert variant eval — both evaluations + combined analysis
-  design/                                # Strategy, briefs, frameworks
-    lean-strategy-canvas.md              # Gothelf & Seiden — goal, obstacles, strategy, OKRs
-    lean-product-canvas.md               # Gothelf & Seiden — problem, outcomes, users, JTBD, hypotheses
-    brief.md                             # JTBD analysis, energy model, prototype specs (P1-P6)
-    taxonomy.md                          # Interaction pattern / component / experience distinction
-    cyclical-methodology.md              # Discovery/delivery cycles — how the work moves
-    value-stream.md                      # 7 moments of value — consumer experience
-    implementation-plan.md               # Cycle-based roadmap to SUS 92
-  collab/                                # Living context docs — one per collaborator audience
-    product.md                           # Leadership/PMs — learnings, product implications, status
-    engineering.md                       # Devs — architecture, tech debt, data model, design tokens
-    design.md                            # UX/UI — label recommendations, priorities, research refs
-    marketing.md                         # Content/comms — story, differentiators, what not to promise
-    sales.md                             # Partnerships — the moat, API surface, licensing
+  design/                                # Strategy, briefs, frameworks, thinking
+  collab/                                # Living context docs — one per audience
   prompts/                               # Reusable AI prompts and build recipes
-    build-observation-prototype.md       # Build prompt for observation prototype
-    build-likert-variant.md              # Build prompt for Likert + diagnostic sub-level variant
-    run-prototype-evaluation.md          # Eval prompt (general LLM)
-    evaluate-likert-variant.md           # Eval prompt for Likert variant
   screenshots/                           # UI screenshots — one folder per variant
-    original/                            # Flat layout screenshots (card, preview, views)
-    likert/                              # Likert variant screenshots (scale, sub-levels, toast)
 ```
-
-### How this works as a system
-
-| Folder | Contains | Naming rule | When to add |
-|--------|----------|-------------|-------------|
-| `research/` | Findings from any test or evaluation | Number-prefixed (`01-`, `02-`…) so sequence is obvious | After every test round |
-| `design/` | Strategy, briefs, frameworks, thinking notes | Short nouns (`brief.md`, `taxonomy.md`) | When framing a problem or defining an approach |
-| `collab/` | Living context docs for cross-functional partners | Named by audience (`product.md`, `engineering.md`) | One per collaborator type. Each file is self-contained — a teammate (or their AI) reads only their file and has full context. |
-| `prompts/` | Reusable AI prompts and recipes | Verb-prefixed (`build-`, `run-`, `evaluate-`) | When you create a prompt worth re-running |
-
-**For a new project:** copy the four empty folders. Research starts at `01-`. Design gets a `brief.md`. Collab gets one file per partner audience. Prompts get named by what they do.
 
 ---
 
